@@ -2,7 +2,7 @@
    css/componentes.css
    Tarjetas de negocio/producto, modales, selector de horarios,
    tabs, badges de estado, paginación y galería
-   Plataforma Hiperlocal | Mobile-First
+   Plataforma Mova | Mobile-First
    ============================================================ */
 
 @import url('variables.css');
@@ -25,25 +25,25 @@
 }
 
 /* Estados de citas */
-.badge--pendiente-pago   { background: #FEF3C7; color: #92400E; }
-.badge--agendada         { background: #DBEAFE; color: #1E40AF; }
-.badge--confirmada       { background: #EAE9FF; color: #4338CA; }
-.badge--en-curso         { background: #F3E8FF; color: #6D28D9; }
-.badge--completada       { background: #DCFCE7; color: #15803D; }
-.badge--cancelada-tiempo { background: #F3F4F6; color: #374151; }
-.badge--cancelada-tarde  { background: #FEE2E2; color: #991B1B; }
-.badge--no-show          { background: #FEE2E2; color: #7F1D1D; }
+.badge--pendiente-pago   { background: var(--badge-pendiente-bg); color: var(--badge-pendiente-text); }
+.badge--agendada         { background: var(--badge-agendada-bg); color: var(--badge-agendada-text); }
+.badge--confirmada       { background: var(--badge-confirmada-bg); color: var(--badge-confirmada-text); }
+.badge--en-curso         { background: var(--badge-en-curso-bg); color: var(--badge-en-curso-text); }
+.badge--completada       { background: var(--badge-completada-bg); color: var(--badge-completada-text); }
+.badge--cancelada-tiempo { background: var(--badge-inactiva-bg); color: var(--badge-inactiva-text); }
+.badge--cancelada-tarde  { background: var(--badge-cancelada-bg); color: var(--badge-cancelada-text); }
+.badge--no-show          { background: var(--badge-cancelada-bg); color: var(--badge-no-show-text); }
 
 /* Estados de apartados */
-.badge--pendiente  { background: #FEF3C7; color: #92400E; }
-.badge--pagado     { background: #DCFCE7; color: #15803D; }
-.badge--expirado   { background: #F3F4F6; color: #374151; }
-.badge--cancelado  { background: #FEE2E2; color: #991B1B; }
+.badge--pendiente  { background: var(--badge-pendiente-bg); color: var(--badge-pendiente-text); }
+.badge--pagado     { background: var(--badge-completada-bg); color: var(--badge-completada-text); }
+.badge--expirado   { background: var(--badge-inactiva-bg); color: var(--badge-inactiva-text); }
+.badge--cancelado  { background: var(--badge-cancelada-bg); color: var(--badge-cancelada-text); }
 
 /* Plan suscripción */
-.badge--pro   { background: #FEF3C7; color: #78350F; }
+.badge--pro   { background: var(--badge-pendiente-bg); color: var(--badge-plan-pro-text); }
 .badge--pro::before   { content: '★ '; }
-.badge--basico { background: #F3F4F6; color: #6B7280; }
+.badge--basico { background: var(--badge-inactiva-bg); color: var(--badge-plan-basico-text); }
 
 /* ═══════════════════════════════════════════════════
    TARJETA DE NEGOCIO (search results)
@@ -92,7 +92,7 @@
   align-items: center;
   justify-content: center;
   font-size: 3rem;
-  background: linear-gradient(135deg, var(--color-primary-light), #fff);
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-surface));
 }
 
 .negocio-card__plan-badge {
@@ -241,8 +241,8 @@
   position: absolute;
   bottom: var(--space-2);
   left: var(--space-2);
-  background: rgba(0,0,0,0.6);
-  color: #fff;
+  background: var(--color-media-overlay);
+  color: var(--color-on-action);
   font-size: var(--text-xs);
   padding: 2px 6px;
   border-radius: var(--radius-sm);
@@ -417,7 +417,7 @@
   position: fixed;
   inset: 0;
   z-index: 500;
-  background: rgba(10, 10, 20, 0.6);
+  background: var(--color-overlay);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: flex-end;   /* Mobile: sube desde abajo */
@@ -562,7 +562,7 @@
 .slot-btn.selected {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-action);
 }
 
 .slot-btn:disabled,
@@ -622,11 +622,11 @@
 .day-btn.selected {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-action);
 }
 
 .day-btn.selected .day-btn__dow {
-  color: rgba(255,255,255,0.75);
+  color: var(--color-on-action-muted);
 }
 
 .day-btn:disabled {
@@ -651,7 +651,7 @@
 
 .search-bar:focus-within {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(108,99,255,0.12);
+  box-shadow: 0 0 0 3px var(--focus-ring-primary);
 }
 
 .search-bar__icon {
@@ -674,7 +674,7 @@
 .search-bar__btn {
   flex-shrink: 0;
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-action);
   border: none;
   border-radius: var(--radius-full);
   padding: var(--space-2) var(--space-4);
@@ -722,7 +722,7 @@
 .chip.active {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-action);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -946,7 +946,7 @@
    ═══════════════════════════════════════════════════ */
 .monedero-banner {
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  color: #fff;
+  color: var(--color-on-action);
   border-radius: var(--radius-2xl);
   padding: var(--space-6) var(--space-8);
   display: flex;
@@ -991,4 +991,48 @@
 .countdown.expired {
   color: var(--color-danger);
   background: var(--color-danger-bg);
+}
+/* Portal del cliente y ticket Click & Collect */
+.cliente-hero { padding: var(--space-8) 0; background: linear-gradient(135deg, var(--hero-gradient-start), var(--hero-gradient-end)); color: var(--color-surface); }
+.cliente-hero h1 { color: var(--color-surface); }
+.cliente-layout { padding: var(--space-6) 0 var(--space-12); }
+.cliente-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); margin-bottom: var(--space-6); }
+.cliente-tab { border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text-muted); padding: var(--space-3); border-radius: var(--radius-md); font-weight: var(--weight-semibold); cursor: pointer; }
+.cliente-tab.active { color: var(--color-primary); border-color: var(--color-primary); background: var(--color-primary-light); }
+.cliente-lista { display: grid; gap: var(--space-4); }
+.cliente-item { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--space-5); box-shadow: var(--shadow-sm); }
+.cliente-item__header { display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-4); }
+.cliente-item__meta { display: grid; gap: var(--space-2); color: var(--color-text-muted); font-size: var(--text-sm); }
+.cliente-item__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
+.cita-pin { display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-4); padding: var(--space-3); border: 1px dashed var(--color-primary); border-radius: var(--radius-md); background: var(--color-primary-light); }
+.cita-pin strong { font-family: var(--font-mono); font-size: var(--text-xl); letter-spacing: var(--space-1); }
+.countdown-apartado { color: var(--color-warning); font-weight: var(--weight-semibold); }
+.countdown-apartado.expired { color: var(--color-danger); }
+.monedero-cliente { display: flex; flex-direction: column; gap: var(--space-4); align-items: flex-start; background: var(--color-surface); color: var(--color-text); border-radius: var(--radius-xl); padding: var(--space-5); box-shadow: var(--shadow-md); margin-top: var(--space-5); }
+.monedero-cliente__saldo { font-size: var(--text-3xl); font-weight: var(--weight-bold); color: var(--color-primary); }
+.modal--ticket { max-width: var(--max-width-sm); }
+.ticket-recoleccion { border: 1px dashed var(--color-border); border-radius: var(--radius-lg); padding: var(--space-5); background: var(--color-surface); }
+.ticket-recoleccion__folio { text-align: center; font-family: var(--font-mono); margin-bottom: var(--space-4); }
+.ticket-recoleccion__sello { padding: var(--space-3); border: 1px solid var(--color-success); border-radius: var(--radius-md); color: var(--color-success); background: var(--color-success-bg); font-weight: var(--weight-bold); text-align: center; margin-bottom: var(--space-5); }
+.ticket-recoleccion__datos { display: grid; gap: var(--space-3); }
+.ticket-recoleccion__datos div { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
+.ticket-recoleccion__datos dt { color: var(--color-text-muted); }
+.ticket-recoleccion__datos dd { margin: 0; text-align: right; font-weight: var(--weight-semibold); }
+.ticket-recoleccion__total { font-size: var(--text-lg); color: var(--color-primary); }
+.ticket-recoleccion__nota { margin-top: var(--space-5); color: var(--color-text-muted); font-size: var(--text-sm); text-align: center; }
+.upload-preview { margin-top: var(--space-3); width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-lg); overflow: hidden; background: var(--color-surface-alt); border: 1px solid var(--color-border); }
+.upload-preview[hidden] { display: none; }
+.upload-preview img { width: 100%; height: 100%; object-fit: cover; }
+.geo-demo-row { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); margin-top: var(--space-4); }
+.geo-demo-row .btn { color: var(--color-surface); border-color: var(--color-surface); }
+.panel-onboarding { width: 100%; max-width: var(--max-width-md); margin-inline: auto; padding: var(--space-8) var(--space-4); }
+.panel-onboarding__form { margin-top: var(--space-6); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-xl); background: var(--color-surface); box-shadow: var(--shadow-md); }
+.panel-onboarding__location { margin-bottom: var(--space-5); padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+.panel-onboarding__location legend { padding-inline: var(--space-2); color: var(--color-text-muted); font-size: var(--text-sm); font-weight: var(--weight-semibold); }
+.panel-nav__item:disabled { opacity: 0.45; cursor: not-allowed; }
+.panel-bottom-nav { overflow-x: auto; }
+.panel-bottom-nav .bottom-nav__item { min-width: var(--space-16); }
+@media (min-width: 768px) {
+  .cliente-item__header, .monedero-cliente { flex-direction: row; align-items: center; justify-content: space-between; }
+  .geo-demo-row { flex-direction: row; justify-content: center; }
 }

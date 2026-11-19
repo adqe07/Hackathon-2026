@@ -287,6 +287,53 @@ export async function cancelarCita(citaId) {
   return _cambiarEstado(citaId, 'cancelar');
 }
 
+/** Abre el ticket reutilizable de Click & Collect. */
+export function mostrarTicketRecoleccion(ticket) {
+  document.getElementById('modal-ticket-recoleccion')?.remove();
+  const modal = document.createElement('div');
+  modal.id = 'modal-ticket-recoleccion';
+  modal.className = 'modal-backdrop open';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'ticket-titulo');
+
+  const direccion = [ticket.direccion, ticket.ciudad].filter(Boolean).join(', ') || 'Consulta la dirección con el negocio';
+  const total = ticket.monto_total ?? ticket.monto ?? 0;
+  modal.innerHTML = `
+    <div class="modal modal--ticket">
+      <div class="modal__header">
+        <h3 class="modal__title" id="ticket-titulo">Ticket de recolección</h3>
+        <button class="modal__close" type="button" data-ticket-cerrar aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal__body">
+        <article class="ticket-recoleccion">
+          <div class="ticket-recoleccion__folio">Folio <strong>${_esc(ticket.folio ?? '')}</strong></div>
+          <div class="ticket-recoleccion__sello">PAGADO - LISTO PARA RECOGER</div>
+          <dl class="ticket-recoleccion__datos">
+            <div><dt>Negocio</dt><dd>${_esc(ticket.negocio ?? '')}</dd></div>
+            <div><dt>Dirección</dt><dd>${_esc(direccion)}</dd></div>
+            <div><dt>Producto</dt><dd>${_esc(ticket.producto ?? '')}</dd></div>
+            <div><dt>Cantidad</dt><dd>${_esc(ticket.cantidad ?? 1)}</dd></div>
+            <div class="ticket-recoleccion__total"><dt>Total pagado</dt><dd>${formatMXN(total)}</dd></div>
+          </dl>
+          <p class="ticket-recoleccion__nota">Presenta este folio en el negocio para recoger tu compra.</p>
+        </article>
+      </div>
+    </div>`;
+
+  const cerrar = () => {
+    document.removeEventListener('keydown', onKeydown);
+    modal.remove();
+  };
+  const onKeydown = (event) => { if (event.key === 'Escape') cerrar(); };
+  modal.addEventListener('click', (event) => {
+    if (event.target === modal || event.target.closest('[data-ticket-cerrar]')) cerrar();
+  });
+  document.addEventListener('keydown', onKeydown);
+  document.body.appendChild(modal);
+  modal.querySelector('[data-ticket-cerrar]')?.focus();
+}
+
 async function _cambiarEstado(citaId, accion, extra = {}) {
   const data = await api.post('citas.php', { action: accion }, {
     cita_id: citaId,
@@ -358,4 +405,9 @@ function _formatFechaHora(fechaISO, horaStr) {
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+function _esc(valor) {
+  return String(valor ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }

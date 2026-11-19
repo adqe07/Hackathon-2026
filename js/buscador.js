@@ -24,7 +24,7 @@ const estado = {
 
 // ─── Referencias DOM (se asignan en init) ─────────────────────────
 let elSearchInput, elSearchBtn, elChips, elGrid, elResultCount,
-    elBtnUbicacion, elSkeletons, elBtnVerMas;
+    elBtnUbicacion, elBtnDemo, elSkeletons, elBtnVerMas;
 
 // ═══════════════════════════════════════════════════════════════════
 // INICIALIZACIÓN
@@ -36,6 +36,7 @@ export async function initBuscador() {
   elGrid         = document.getElementById('negocios-grid');
   elResultCount  = document.getElementById('result-count');
   elBtnUbicacion = document.getElementById('btn-ubicacion');
+  elBtnDemo      = document.getElementById('btn-ubicacion-demo');
   elBtnVerMas    = document.getElementById('btn-ver-mas');
 
   if (!elSearchInput || !elGrid) return; // No estamos en index.html
@@ -110,6 +111,16 @@ function _bindEventos() {
     } finally {
       elBtnUbicacion.disabled = false;
     }
+  });
+
+  elBtnDemo?.addEventListener('click', async () => {
+    const coords = geo.usarUbicacionDemo();
+    estado.lat = coords.lat;
+    estado.lon = coords.lon;
+    estado.pagina = 1;
+    _actualizarBtnUbicacion(coords.source);
+    toast('Ubicación demo activada: Roma Norte, CDMX.', 'success');
+    await buscar();
   });
 
   // Ver más (paginación)
@@ -245,7 +256,7 @@ function crearNegocioCard(negocio) {
           <div class="negocio-card__nombre">
             ${_escape(negocio.nombre)} ${verificadoIcon}
           </div>
-          <div class="negocio-card__categoria">${_escape(negocio.categoria)}</div>
+          <div class="negocio-card__categoria">${_escape(_formatearCategoria(negocio.categoria))}</div>
         </div>
       </div>
       ${negocio.descripcion ? `<p class="negocio-card__desc">${_escape(negocio.descripcion)}</p>` : ''}
@@ -299,7 +310,7 @@ function mostrarError(msg) {
 // ─── Helpers privados ─────────────────────────────────────────────
 function _actualizarBtnUbicacion(source) {
   if (!elBtnUbicacion) return;
-  const iconos = { gps: '📍', manual: '🔍', default: '🌆' };
+  const iconos = { gps: '📍', manual: '🔍', default: '🌆', demo: '🧪' };
   elBtnUbicacion.innerHTML = `${iconos[source] ?? '📍'} Actualizar ubicación`;
 }
 
@@ -318,12 +329,32 @@ function _categoriaEmoji(cat) {
     barberia:   '✂️',
     perfumeria: '🌸',
     bazar:      '🛍️',
+    boutique:   '🧥',
     taller:     '🔧',
+    tecnico:    '💻',
     ropa:       '👗',
     joyeria:    '💍',
-    tech:       '💻',
+    comercio:   '✏️',
+    otro:       '🏪',
   };
   return mapa[cat?.toLowerCase()] ?? '🏪';
+}
+
+function _formatearCategoria(categoria) {
+  const etiquetas = {
+    estetica: 'Estética',
+    barberia: 'Barbería',
+    perfumeria: 'Perfumería',
+    bazar: 'Bazar',
+    boutique: 'Boutique',
+    taller: 'Taller',
+    tecnico: 'Servicio técnico',
+    ropa: 'Ropa',
+    joyeria: 'Joyería',
+    comercio: 'Comercio local',
+    otro: 'Otro comercio',
+  };
+  return etiquetas[categoria?.toLowerCase()] ?? categoria ?? 'Comercio local';
 }
 
 function _debounce(fn, ms) {

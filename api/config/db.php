@@ -3,7 +3,7 @@
  * api/config/db.php
  * -------------------------------------------------
  * Conexión PDO segura + helpers de respuesta JSON.
- * Plataforma Hiperlocal | Fase 1: Cimientos
+ * Plataforma Mova | Fase 1: Cimientos
  * -------------------------------------------------
  */
 
@@ -20,7 +20,7 @@ if (ob_get_level() === 0) {
 // ─────────────────────────────────────────────────
 define('DB_HOST',    '127.0.0.1');
 define('DB_PORT',    '3306');
-define('DB_NAME',    'hiperlocal');
+define('DB_NAME',    'mova');
 define('DB_USER',    'root');
 define('DB_PASS',    '');           // Cambia en producción
 define('DB_CHARSET', 'utf8mb4');

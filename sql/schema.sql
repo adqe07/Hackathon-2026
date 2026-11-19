@@ -1,5 +1,5 @@
 -- =============================================================================
--- PLATAFORMA HIPERLOCAL DE COMERCIO Y SERVICIOS
+-- MOVA: PLATAFORMA DE COMERCIO Y SERVICIOS CERCANOS
 -- Script: schema.sql
 -- Motor: InnoDB | Charset: utf8mb4_unicode_ci
 -- Versión: 1.0  |  Fase 1: Cimientos y Base de Datos
@@ -13,11 +13,11 @@ SET sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVIS
 -- -----------------------------------------------------------------------------
 -- Base de datos
 -- -----------------------------------------------------------------------------
-CREATE DATABASE IF NOT EXISTS hiperlocal
+CREATE DATABASE IF NOT EXISTS mova
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE hiperlocal;
+USE mova;
 
 -- =============================================================================
 -- TABLA: usuarios
@@ -342,7 +342,7 @@ CREATE TABLE IF NOT EXISTS movimientos_ledger (
 -- Hash verificado con password_hash('Demo1234!', PASSWORD_BCRYPT, ['cost' => 12]):
 -- $2y$12$4Yi2e.D.B3WgW//Pg2q9h.oo.fbA253rXz4bHgYHPfoLrVotw6p16
 INSERT INTO usuarios (nombre, email, password_hash, telefono, rol, saldo_monedero, activo) VALUES
-('Admin Sistema',      'admin@hiperlocal.mx',    '$2y$12$4Yi2e.D.B3WgW//Pg2q9h.oo.fbA253rXz4bHgYHPfoLrVotw6p16', '5500000001', 'admin',   0.00, 1),
+('Admin Sistema',      'admin@mova.mx',          '$2y$12$4Yi2e.D.B3WgW//Pg2q9h.oo.fbA253rXz4bHgYHPfoLrVotw6p16', '5500000001', 'admin',   0.00, 1),
 ('Dueña Estética',     'estetica@demo.mx',       '$2y$12$4Yi2e.D.B3WgW//Pg2q9h.oo.fbA253rXz4bHgYHPfoLrVotw6p16', '5511111111', 'negocio', 0.00, 1),
 ('Dueña Perfumería',   'perfumeria@demo.mx',     '$2y$12$4Yi2e.D.B3WgW//Pg2q9h.oo.fbA253rXz4bHgYHPfoLrVotw6p16', '5522222222', 'negocio', 0.00, 1),
 ('Ana García',         'ana@cliente.mx',         '$2y$12$4Yi2e.D.B3WgW//Pg2q9h.oo.fbA253rXz4bHgYHPfoLrVotw6p16', '5533333333', 'cliente', 150.00, 1),

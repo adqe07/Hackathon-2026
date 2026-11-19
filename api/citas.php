@@ -8,7 +8,7 @@
  * - Validación por PIN de 4 dígitos en el local
  * - Auditoría en movimientos_ledger y política de cancelación
  * -------------------------------------------------
- * Plataforma Hiperlocal | Fase 2: Backend API
+ * Plataforma Mova | Fase 2: Backend API
  * -------------------------------------------------
  */
 
@@ -28,6 +28,9 @@ require_once __DIR__ . '/config/db.php';
 $action = trim($_GET['action'] ?? '');
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Aplicar automáticamente la tolerancia de 15 minutos antes de cada operación.
+procesarNoShowsVencidos();
+
 match ($action) {
     'slots'     => handleSlots($method),
     'crear'     => handleCrearCita($method),
@@ -41,6 +44,63 @@ match ($action) {
         'error'   => "Acción '$action' no válida en citas.php.",
     ], 400),
 };
+
+/**
+ * Marca citas vencidas como no_show y libera el anticipo al negocio.
+ * El bloqueo de filas evita acreditar dos veces ante peticiones simultáneas.
+ */
+function procesarNoShowsVencidos(): void
+{
+    $pdo = getPDO();
+
+    try {
+        $pdo->beginTransaction();
+        $stmt = $pdo->prepare("
+            SELECT c.id, c.monto_anticipo, n.usuario_id AS negocio_usuario_id
+            FROM citas c
+            JOIN negocios n ON n.id = c.negocio_id
+            WHERE c.estado IN ('agendada', 'confirmada')
+              AND c.fecha_hora_inicio < DATE_SUB(NOW(), INTERVAL 15 MINUTE)
+            ORDER BY c.fecha_hora_inicio ASC
+            LIMIT 100
+            FOR UPDATE
+        ");
+        $stmt->execute();
+        $vencidas = $stmt->fetchAll();
+
+        $actualizar = $pdo->prepare("
+            UPDATE citas
+            SET estado = 'no_show', monto_anticipo_retenido = monto_anticipo
+            WHERE id = ? AND estado IN ('agendada', 'confirmada')
+        ");
+        $acreditar = $pdo->prepare('UPDATE usuarios SET saldo_monedero = saldo_monedero + ? WHERE id = ?');
+        $ledger = $pdo->prepare("
+            INSERT INTO movimientos_ledger (cita_id, usuario_id, tipo, monto, descripcion)
+            VALUES (?, ?, 'compensacion_negocio', ?, ?)
+        ");
+
+        foreach ($vencidas as $cita) {
+            $actualizar->execute([$cita['id']]);
+            if ($actualizar->rowCount() !== 1) continue;
+
+            $anticipo = (float) $cita['monto_anticipo'];
+            if ($anticipo <= 0) continue;
+
+            $acreditar->execute([$anticipo, $cita['negocio_usuario_id']]);
+            $ledger->execute([
+                $cita['id'],
+                $cita['negocio_usuario_id'],
+                $anticipo,
+                "Compensación al negocio por inasistencia a cita #{$cita['id']}",
+            ]);
+        }
+
+        $pdo->commit();
+    } catch (\Throwable $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        error_log('[PROCESAR_NO_SHOW_ERROR] ' . $e->getMessage());
+    }
+}
 
 /**
  * GET /api/citas.php?action=slots&negocio_id=1&servicio_id=1&fecha=2026-11-20
@@ -155,11 +215,13 @@ function handleCrearCita(string $method): never
 
         // 1. Obtener datos del servicio y negocio
         $stmt = $pdo->prepare('
-            SELECT s.nombre, s.duracion_minutos, s.monto_anticipo, n.usuario_id AS dueno_id
+            SELECT s.nombre, s.duracion_minutos, s.monto_anticipo,
+                   n.usuario_id AS dueno_id, n.plan_suscripcion
             FROM servicios s
             JOIN negocios n ON n.id = s.negocio_id
             WHERE s.id = ? AND s.negocio_id = ? AND s.activo = 1 AND n.activo = 1
             LIMIT 1
+            FOR UPDATE
         ');
         $stmt->execute([$servicioId, $negocioId]);
         $info = $stmt->fetch();
@@ -170,6 +232,21 @@ function handleCrearCita(string $method): never
 
         $duracion = (int) $info['duracion_minutos'];
         $anticipo = (float) $info['monto_anticipo'];
+
+        if ($info['plan_suscripcion'] === 'basico' && $anticipo > 0) {
+            $stmtLimite = $pdo->prepare("
+                SELECT COUNT(*)
+                FROM citas
+                WHERE negocio_id = ?
+                  AND monto_anticipo > 0
+                  AND created_at >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01')
+                  AND created_at < DATE_ADD(DATE_FORMAT(CURRENT_DATE, '%Y-%m-01'), INTERVAL 1 MONTH)
+            ");
+            $stmtLimite->execute([$negocioId]);
+            if ((int) $stmtLimite->fetchColumn() >= 5) {
+                throw new \RuntimeException('Este negocio alcanzó el límite mensual de 5 citas con anticipo de su Plan Básico.');
+            }
+        }
 
         $dtInicio = new DateTimeImmutable($fechaInicio);
         $dtFin    = $dtInicio->modify("+{$duracion} minutes");
@@ -294,7 +371,8 @@ function handleListarCitas(string $method): never
             s.duracion_minutos,
             u.nombre AS nombre_cliente,
             u.telefono AS telefono_cliente,
-            n.nombre AS nombre_negocio
+            n.nombre AS nombre_negocio,
+            n.ventana_cancelacion_horas
         FROM citas c
         JOIN servicios s ON s.id = c.servicio_id
         JOIN usuarios u ON u.id = c.cliente_id

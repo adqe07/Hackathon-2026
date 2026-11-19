@@ -5,7 +5,7 @@
  * Endpoint REST para consulta de perfil público de negocios,
  * KPIs para el panel del comerciante y actualización de datos.
  * -------------------------------------------------
- * Plataforma Hiperlocal | Fase 2: Backend API
+ * Plataforma Mova | Fase 2: Backend API
  * -------------------------------------------------
  */
 
@@ -28,12 +28,101 @@ $method = $_SERVER['REQUEST_METHOD'];
 match ($action) {
     'perfil'    => handlePerfil($method),
     'dashboard' => handleDashboard($method),
+    'crear'     => handleCrear($method),
     'actualizar'=> handleActualizar($method),
     default     => jsonResponse([
         'success' => false,
-        'error'   => "Acción '$action' no válida en negocios.php. Usa: perfil, dashboard, actualizar.",
+        'error'   => "Acción '$action' no válida en negocios.php. Usa: perfil, dashboard, crear, actualizar.",
     ], 400),
 };
+
+function handleCrear(string $method): never
+{
+    if ($method !== 'POST') jsonResponse(['success' => false, 'error' => 'Método no permitido. Usa POST.'], 405);
+
+    $usuario = requireAuth('negocio');
+    $body = getJsonInput();
+    $nombre = trim($body['nombre'] ?? '');
+    $categoria = trim($body['categoria'] ?? '');
+    $descripcion = trim($body['descripcion'] ?? '');
+    $telefono = trim($body['telefono_contacto'] ?? '');
+    $direccion = trim($body['direccion'] ?? '');
+    $ciudad = trim($body['ciudad'] ?? '');
+    $ventana = filter_var($body['ventana_cancelacion_horas'] ?? 24, FILTER_VALIDATE_INT);
+    $latitud = validarCoordenada($body['latitud'] ?? null, -90, 90, 'latitud');
+    $longitud = validarCoordenada($body['longitud'] ?? null, -180, 180, 'longitud');
+
+    if ($nombre === '' || mb_strlen($nombre) > 150) {
+        jsonResponse(['success' => false, 'error' => 'El nombre del negocio es obligatorio y admite hasta 150 caracteres.'], 422);
+    }
+    if (!in_array($categoria, categoriasPermitidas(), true)) {
+        jsonResponse(['success' => false, 'error' => 'Selecciona una categoría válida.'], 422);
+    }
+    if (mb_strlen($descripcion) > 5000 || mb_strlen($telefono) > 20 || mb_strlen($direccion) > 300 || mb_strlen($ciudad) > 100) {
+        jsonResponse(['success' => false, 'error' => 'Uno o más campos superan la longitud permitida.'], 422);
+    }
+    if ($ventana === false || $ventana < 1 || $ventana > 168) {
+        jsonResponse(['success' => false, 'error' => 'La ventana de cancelación debe estar entre 1 y 168 horas.'], 422);
+    }
+
+    $pdo = getPDO();
+    try {
+        $pdo->beginTransaction();
+        $bloqueo = $pdo->prepare("SELECT id FROM usuarios WHERE id = ? AND rol = 'negocio' FOR UPDATE");
+        $bloqueo->execute([$usuario['id']]);
+        if (!$bloqueo->fetch()) throw new \RuntimeException('La cuenta no es válida para registrar un negocio.');
+
+        $existente = $pdo->prepare('SELECT id FROM negocios WHERE usuario_id = ? LIMIT 1');
+        $existente->execute([$usuario['id']]);
+        if ($existente->fetch()) {
+            $pdo->rollBack();
+            jsonResponse(['success' => false, 'error' => 'Esta cuenta ya tiene un negocio configurado.'], 409);
+        }
+
+        $insert = $pdo->prepare('
+            INSERT INTO negocios
+                (usuario_id, nombre, categoria, descripcion, telefono_contacto,
+                 direccion, ciudad, latitud, longitud, ventana_cancelacion_horas)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ');
+        $insert->execute([
+            $usuario['id'], $nombre, $categoria, $descripcion ?: null,
+            $telefono ?: null, $direccion ?: null, $ciudad ?: null,
+            $latitud, $longitud, $ventana,
+        ]);
+        $negocioId = (int) $pdo->lastInsertId();
+        $pdo->commit();
+
+        jsonResponse([
+            'success' => true,
+            'mensaje' => 'Negocio configurado correctamente.',
+            'negocio' => [
+                'id' => $negocioId, 'nombre' => $nombre, 'categoria' => $categoria,
+                'plan_suscripcion' => 'basico', 'verificado' => false,
+            ],
+        ], 201);
+    } catch (\Throwable $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        error_log('[CREAR_NEGOCIO_ERROR] ' . $e->getMessage());
+        jsonResponse(['success' => false, 'error' => 'No fue posible configurar el negocio.'], 500);
+    }
+}
+
+function validarCoordenada(mixed $valor, float $minimo, float $maximo, string $campo): ?float
+{
+    if ($valor === null || $valor === '') return null;
+    $coordenada = filter_var($valor, FILTER_VALIDATE_FLOAT);
+    if ($coordenada === false || $coordenada < $minimo || $coordenada > $maximo) {
+        jsonResponse(['success' => false, 'error' => "La $campo no es válida."], 422);
+    }
+    return (float) $coordenada;
+}
+
+function categoriasPermitidas(): array
+{
+    return ['estetica', 'barberia', 'perfumeria', 'bazar', 'boutique', 'taller',
+            'tecnico', 'ropa', 'joyeria', 'comercio', 'otro'];
+}
 
 /**
  * GET /api/negocios.php?action=perfil&id=1&lat=...&lon=...
@@ -253,6 +342,9 @@ function handleActualizar(string $method): never
 
     if ($nombre === '') {
         jsonResponse(['success' => false, 'error' => 'El nombre del negocio es obligatorio.'], 422);
+    }
+    if (!in_array($categoria, categoriasPermitidas(), true)) {
+        jsonResponse(['success' => false, 'error' => 'La categoría seleccionada no está permitida.'], 422);
     }
 
     $updateSql = '

@@ -9,7 +9,7 @@
  *   logout    — Destruye la sesión activa
  *   me        — Devuelve datos del usuario autenticado
  * -------------------------------------------------
- * Plataforma Hiperlocal | Fase 1: Cimientos
+ * Plataforma Mova | Fase 1: Cimientos
  * -------------------------------------------------
  */
 

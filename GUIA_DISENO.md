@@ -64,3 +64,35 @@ Para no romper el funcionamiento de JavaScript:
 * **No elimines los IDs** (por ejemplo: `id="search-input"`, `id="negocios-grid"`, `id="login-form"`).
 * **No renombres las clases de estado** (por ejemplo: `.active`, `.selected`, `.is-error`, `.badge--pro`).
 * **Usa siempre variables:** En lugar de poner colores fijos como `color: #6C63FF;`, usa `color: var(--color-primary);`. Así tus cambios se propagarán perfectamente.
+
+---
+
+## 5. Tokens semánticos y personalización puntual
+
+Además de la marca principal, `css/variables.css` concentra los contrastes y estados. El diseñador puede cambiar el sistema completo sin buscar colores dentro de los componentes:
+
+```css
+--color-on-action:       #FFFFFF; /* Texto sobre botones o fondos de marca */
+--color-success-text:    #15803D;
+--color-warning-text:    #92400E;
+--color-danger-text:     #991B1B;
+--color-info-text:       #1D4ED8;
+--color-overlay:         rgba(10,10,20,0.60);
+--focus-ring-primary:    rgba(108,99,255,0.15);
+```
+
+Los badges también tienen tokens separados de fondo y texto (`--badge-*-bg` y `--badge-*-text`). Esto permite ajustar contraste, modo oscuro o identidad visual sin modificar `componentes.css`.
+
+Para cambios específicos de una pantalla o componente:
+
+| Elemento | Selector principal en `css/componentes.css` |
+|---|---|
+| Portal del cliente | `.cliente-*` |
+| Monedero | `.monedero-cliente` |
+| PIN de cita | `.cita-pin` |
+| Ticket de recolección | `.ticket-recoleccion*` |
+| Vista previa de fotografía | `.upload-preview` |
+| Ubicación de demostración | `.geo-demo-row` |
+| Alta inicial del negocio | `.panel-onboarding*` |
+
+El modo oscuro automático permanece disponible mediante `prefers-color-scheme`. El diseñador puede conservarlo, modificar sus tokens o retirar ese bloque según el criterio visual final.

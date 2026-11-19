@@ -59,17 +59,18 @@ async function request(endpoint, method = 'GET', params = {}, body = null) {
     if (v !== undefined && v !== null) url.searchParams.set(k, v);
   });
 
+  const esFormData = body instanceof FormData;
   const options = {
     method,
     headers: {
-      'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
+      ...(esFormData ? {} : { 'Content-Type': 'application/json' }),
     },
     credentials: 'same-origin', // Incluir cookies de sesión PHP
   };
 
   if (body !== null) {
-    options.body = JSON.stringify(body);
+    options.body = esFormData ? body : JSON.stringify(body);
   }
 
   let response;
@@ -151,6 +152,11 @@ export const api = {
    */
   post(endpoint, params = {}, body = {}) {
     return request(endpoint, 'POST', params, body);
+  },
+
+  /** Envía multipart/form-data (el navegador define el boundary). */
+  postForm(endpoint, params = {}, formData) {
+    return request(endpoint, 'POST', params, formData);
   },
 };
 

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Perfil público del negocio — productos y servicios disponibles.">
-  <title>Negocio | Hiperlocal</title>
+  <title>Negocio | Mova</title>
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/componentes.css">
@@ -52,9 +52,9 @@
   <div class="container">
     <a href="index.html" class="logo">
       <span class="logo__icon">📍</span>
-      Hiperlocal
+      Mova
     </a>
-    <nav class="header-nav">
+    <nav class="header-nav" id="negocio-nav">
       <a href="index.html" class="btn btn--ghost btn--sm">← Volver</a>
     </nav>
   </div>
@@ -156,7 +156,7 @@
   <a href="index.html" class="bottom-nav__item">
     <span class="icon">🔍</span><span>Buscar</span>
   </a>
-  <a href="login.html" class="bottom-nav__item">
+  <a href="login.html" class="bottom-nav__item" id="negocio-mis-citas">
     <span class="icon">🗓</span><span>Mis Citas</span>
   </a>
   <a href="login.html" class="bottom-nav__item">
@@ -166,7 +166,7 @@
 
 <script type="module">
   import { api, ApiError, formatMXN, formatFecha, toast, btnLoading } from './js/api.js';
-  import { AgendaCalendario } from './js/agenda.js';
+  import { AgendaCalendario, mostrarTicketRecoleccion } from './js/agenda.js';
   import { geo, Geolocalizacion } from './js/geolocalizacion.js';
 
   // ── Leer negocio_id de la URL ─────────────────────────────────
@@ -176,6 +176,20 @@
   if (!negocioId) {
     window.location.href = 'index.html';
   }
+
+  (async () => {
+    try {
+      const me = await api.get('auth.php', { action: 'me' });
+      if (me.usuario?.rol === 'cliente') {
+        const enlace = document.createElement('a');
+        enlace.href = 'mis-citas.html';
+        enlace.className = 'btn btn--primary btn--sm';
+        enlace.textContent = 'Mis Citas y Apartados';
+        document.getElementById('negocio-nav').appendChild(enlace);
+        document.getElementById('negocio-mis-citas').href = 'mis-citas.html';
+      }
+    } catch {}
+  })();
 
   // ── Tabs ──────────────────────────────────────────────────────
   document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
@@ -235,7 +249,7 @@
   }
 
   function _renderPerfil(n, coords) {
-    document.title = `${n.nombre} | Hiperlocal`;
+    document.title = `${n.nombre} | Mova`;
     document.getElementById('negocio-nombre').textContent    = n.nombre;
     document.getElementById('negocio-descripcion').textContent = n.descripcion ?? '';
 
@@ -381,14 +395,21 @@
       btnLoading(btn, true);
 
       try {
-        await api.post('productos.php', { action: 'apartar' }, {
+        const apartado = await api.post('productos.php', { action: 'apartar' }, {
           producto_id: producto.id,
           negocio_id:  negocioId,
           tipo_pago:   tipo,
           notas_cliente: notas || null,
         });
-        cerrarModal(modalApartado);
-        toast(`¡Producto apartado! ${tipo === 'efectivo_tienda' ? 'Tienes 3 horas para ir a pagar.' : 'Procede con el pago online.'}`, 'success', 5000);
+        if (tipo === 'online') {
+          const pago = await api.post('pagos_simulador.php', { action: 'pagar_apartado' }, { apartado_id: apartado.apartado_id });
+          cerrarModal(modalApartado);
+          mostrarTicketRecoleccion(pago.ticket);
+          toast('Pago completado. Tu ticket está listo.', 'success', 5000);
+        } else {
+          cerrarModal(modalApartado);
+          toast('¡Producto apartado! Tienes 3 horas para ir a pagar.', 'success', 5000);
+        }
         cargarProductos(); // Refrescar stock
       } catch (err) {
         errEl.textContent   = err.message;

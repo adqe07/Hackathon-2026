@@ -13,9 +13,10 @@
 
 // Coordenadas por defecto: Centro de CDMX (Zócalo)
 const COORDS_DEFAULT = { lat: 19.4326, lon: -99.1332, source: 'default' };
+const COORDS_DEMO_ROMA_NORTE = { lat: 19.41944, lon: -99.16266, source: 'demo' };
 
 // Clave de localStorage para guardar la última posición conocida
-const STORAGE_KEY = 'hiperlocal_ultima_posicion';
+const STORAGE_KEY = 'mova_ultima_posicion';
 
 export class Geolocalizacion {
   constructor() {
@@ -272,6 +273,15 @@ export class Geolocalizacion {
    */
   actualizar() {
     return this.obtenerPosicion({ forcePrompt: true });
+  }
+
+  /** Fija una coordenada reproducible para probar los negocios semilla. */
+  usarUbicacionDemo() {
+    const coords = { ...COORDS_DEMO_ROMA_NORTE };
+    this._posicion = coords;
+    this._guardarStorage(coords);
+    this._emitir(coords);
+    return coords;
   }
 
   /**

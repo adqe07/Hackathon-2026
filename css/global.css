@@ -1,7 +1,7 @@
 /* ============================================================
    css/global.css
    Reset, layout base, tipografía, botones, formularios y grid
-   Plataforma Hiperlocal | Mobile-First
+   Plataforma Mova | Mobile-First
    ============================================================ */
 
 @import url('variables.css');
@@ -12,6 +12,8 @@
   margin: 0;
   padding: 0;
 }
+
+[hidden] { display: none !important; }
 
 html {
   font-size: 16px;
@@ -124,7 +126,7 @@ p:last-child { margin-bottom: 0; }
   height: var(--bottom-nav-h);
   background: var(--color-surface);
   border-top: 1px solid var(--color-border);
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-bottom-nav);
 }
 
 .bottom-nav__item {
@@ -197,15 +199,15 @@ p:last-child { margin-bottom: 0; }
 
 .btn--primary {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-action);
   border-color: var(--color-primary);
 }
 .btn--primary:hover {
   background: var(--color-primary-dark);
   border-color: var(--color-primary-dark);
-  box-shadow: 0 4px 14px rgba(108,99,255,0.35);
+  box-shadow: var(--shadow-primary);
   text-decoration: none;
-  color: #fff;
+  color: var(--color-on-action);
 }
 
 .btn--secondary {
@@ -220,14 +222,14 @@ p:last-child { margin-bottom: 0; }
 
 .btn--danger {
   background: var(--color-danger);
-  color: #fff;
+  color: var(--color-on-action);
   border-color: var(--color-danger);
 }
 .btn--danger:hover {
-  background: #DC2626;
-  border-color: #DC2626;
+  background: var(--color-danger-dark);
+  border-color: var(--color-danger-dark);
   text-decoration: none;
-  color: #fff;
+  color: var(--color-on-action);
 }
 
 .btn--ghost {
@@ -243,7 +245,7 @@ p:last-child { margin-bottom: 0; }
 
 .btn--success {
   background: var(--color-success);
-  color: #fff;
+  color: var(--color-on-action);
   border-color: var(--color-success);
 }
 
@@ -286,7 +288,7 @@ p:last-child { margin-bottom: 0; }
 
 .form-control:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
+  box-shadow: 0 0 0 3px var(--focus-ring-primary);
 }
 
 .form-control::placeholder { color: var(--color-text-light); }
@@ -330,22 +332,22 @@ select.form-control {
 .alert--success {
   background: var(--color-success-bg);
   border-color: var(--color-success);
-  color: #15803D;
+  color: var(--color-success-text);
 }
 .alert--warning {
   background: var(--color-warning-bg);
   border-color: var(--color-warning);
-  color: #92400E;
+  color: var(--color-warning-text);
 }
 .alert--danger {
   background: var(--color-danger-bg);
   border-color: var(--color-danger);
-  color: #991B1B;
+  color: var(--color-danger-text);
 }
 .alert--info {
   background: var(--color-info-bg);
   border-color: var(--color-info);
-  color: #1D4ED8;
+  color: var(--color-info-text);
 }
 
 /* ── Grid responsivo ────────────────────────────── */

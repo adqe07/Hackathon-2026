@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Consulta tus citas, apartados, compras y saldo Mova.">
+  <title>Mis Citas y Apartados | Mova</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/componentes.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="logo"><span class="logo__icon">📍</span> Mova</a>
+      <nav class="header-nav" aria-label="Navegación principal">
+        <a href="index.html" class="btn btn--ghost btn--sm">Explorar</a>
+        <button id="btn-logout-cliente" class="btn btn--ghost btn--sm">Salir</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section class="cliente-hero">
+      <div class="container container--lg">
+        <h1>Mis Citas y Apartados</h1>
+        <p>Administra tus reservas y presenta tus tickets al recoger.</p>
+        <div class="monedero-cliente" aria-label="Saldo del monedero">
+          <div>
+            <span class="text-sm text-muted">Saldo actual</span>
+            <div id="saldo-monedero" class="monedero-cliente__saldo">$0.00</div>
+          </div>
+          <div class="flex gap-2" style="flex-wrap:wrap;">
+            <label class="sr-only" for="monto-recarga">Monto a recargar</label>
+            <select id="monto-recarga" class="form-control" aria-label="Monto a recargar">
+              <option value="200">$200</option>
+              <option value="500" selected>$500</option>
+              <option value="1000">$1,000</option>
+            </select>
+            <button id="btn-recargar" class="btn btn--primary">Recarga rápida</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cliente-layout">
+      <div class="container container--lg">
+        <div class="cliente-tabs" role="tablist" aria-label="Contenido del cliente">
+          <button class="cliente-tab active" id="tab-citas" role="tab" aria-selected="true" aria-controls="panel-citas" data-tab="citas">Mis Citas</button>
+          <button class="cliente-tab" id="tab-apartados" role="tab" aria-selected="false" aria-controls="panel-apartados" data-tab="apartados">Mis Apartados y Compras</button>
+        </div>
+        <section id="panel-citas" role="tabpanel" aria-labelledby="tab-citas">
+          <div id="lista-citas" class="cliente-lista" aria-live="polite"><span class="spinner"></span></div>
+        </section>
+        <section id="panel-apartados" role="tabpanel" aria-labelledby="tab-apartados" hidden>
+          <div id="lista-apartados" class="cliente-lista" aria-live="polite"><span class="spinner"></span></div>
+        </section>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="js/cliente.js"></script>
+</body>
+</html>

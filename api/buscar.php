@@ -2,11 +2,11 @@
 /**
  * api/buscar.php
  * -------------------------------------------------
- * Endpoint REST para búsqueda hiperlocal de negocios.
+ * Endpoint REST para búsqueda por cercanía de negocios.
  * Implementa la Fórmula de Haversine para cálculo de
  * distancia en kilómetros a partir de coordenadas GPS.
  * -------------------------------------------------
- * Plataforma Hiperlocal | Fase 2: Backend API
+ * Plataforma Mova | Fase 2: Backend API
  * -------------------------------------------------
  */
 
@@ -70,20 +70,31 @@ function handleBuscar(): never
     if ($q !== '') {
         $whereParts[] = '
             (
-                n.nombre LIKE :term
-                OR n.descripcion LIKE :term
-                OR n.categoria LIKE :term
+                n.nombre LIKE :term_nombre
+                OR n.descripcion LIKE :term_descripcion
+                OR n.categoria LIKE :term_categoria
                 OR EXISTS (
                     SELECT 1 FROM productos p
-                    WHERE p.negocio_id = n.id AND p.activo = 1 AND (p.titulo LIKE :term OR p.descripcion LIKE :term)
+                    WHERE p.negocio_id = n.id
+                      AND p.activo = 1
+                      AND (p.titulo LIKE :term_producto_titulo OR p.descripcion LIKE :term_producto_descripcion)
                 )
                 OR EXISTS (
                     SELECT 1 FROM servicios s
-                    WHERE s.negocio_id = n.id AND s.activo = 1 AND (s.nombre LIKE :term OR s.descripcion LIKE :term)
+                    WHERE s.negocio_id = n.id
+                      AND s.activo = 1
+                      AND (s.nombre LIKE :term_servicio_nombre OR s.descripcion LIKE :term_servicio_descripcion)
                 )
             )
         ';
-        $whereParams[':term'] = '%' . $q . '%';
+        $term = '%' . $q . '%';
+        $whereParams[':term_nombre'] = $term;
+        $whereParams[':term_descripcion'] = $term;
+        $whereParams[':term_categoria'] = $term;
+        $whereParams[':term_producto_titulo'] = $term;
+        $whereParams[':term_producto_descripcion'] = $term;
+        $whereParams[':term_servicio_nombre'] = $term;
+        $whereParams[':term_servicio_descripcion'] = $term;
     }
 
     $whereSQL = implode(' AND ', $whereParts);

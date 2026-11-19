@@ -6,7 +6,7 @@
  * para acreditar compras online, apartados Click & Collect
  * y recargas de monedero en entorno local de pruebas.
  * -------------------------------------------------
- * Plataforma Hiperlocal | Fase 2: Backend API
+ * Plataforma Mova | Fase 2: Backend API
  * -------------------------------------------------
  */
 
@@ -55,8 +55,9 @@ function handlePagarApartado(string $method): never
         $pdo->beginTransaction();
 
         $stmt = $pdo->prepare("
-            SELECT a.id, a.producto_id, a.monto_total, a.cantidad, a.estado, a.negocio_id,
-                   n.usuario_id AS dueno_negocio_id, p.titulo AS nombre_producto
+            SELECT a.id, a.producto_id, a.monto_total, a.cantidad, a.estado, a.tipo_pago, a.negocio_id,
+                   n.usuario_id AS dueno_negocio_id, n.nombre AS nombre_negocio,
+                   n.direccion, n.ciudad, p.titulo AS nombre_producto
             FROM apartados a
             JOIN negocios n ON n.id = a.negocio_id
             JOIN productos p ON p.id = a.producto_id
@@ -72,6 +73,10 @@ function handlePagarApartado(string $method): never
 
         if ($apartado['estado'] !== 'pendiente') {
             throw new \RuntimeException("El apartado ya se encuentra en estado '{$apartado['estado']}'.");
+        }
+
+        if ($apartado['tipo_pago'] !== 'online') {
+            throw new \RuntimeException('Este apartado debe pagarse en efectivo directamente en el negocio.');
         }
 
         // Marcar como pagado y descontar del inventario total definitivo
@@ -107,7 +112,12 @@ function handlePagarApartado(string $method): never
             'referencia_pago' => $refPago,
             'ticket'          => [
                 'apartado_id' => $apartadoId,
+                'folio'       => 'REC-' . str_pad((string) $apartadoId, 8, '0', STR_PAD_LEFT),
+                'negocio'     => $apartado['nombre_negocio'],
+                'direccion'   => $apartado['direccion'],
+                'ciudad'      => $apartado['ciudad'],
                 'producto'    => $apartado['nombre_producto'],
+                'cantidad'    => (int) $apartado['cantidad'],
                 'monto'       => $monto,
                 'fecha_pago'  => date('Y-m-d H:i:s'),
             ],
@@ -136,11 +146,18 @@ function handleRecargarMonedero(string $method): never
     }
 
     $pdo = getPDO();
-    $pdo->prepare('UPDATE usuarios SET saldo_monedero = saldo_monedero + ? WHERE id = ?')
-        ->execute([$monto, $usuario['id']]);
+    try {
+        $pdo->beginTransaction();
+        $pdo->prepare('UPDATE usuarios SET saldo_monedero = saldo_monedero + ? WHERE id = ?')
+            ->execute([$monto, $usuario['id']]);
+        $pdo->commit();
 
-    jsonResponse([
-        'success' => true,
-        'mensaje' => "Recarga de $$monto MXN acreditada a tu monedero.",
-    ]);
+        jsonResponse([
+            'success' => true,
+            'mensaje' => "Recarga de $$monto MXN acreditada a tu monedero.",
+        ]);
+    } catch (\Throwable $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        jsonResponse(['success' => false, 'error' => 'No fue posible acreditar la recarga.'], 500);
+    }
 }

@@ -1,11 +1,11 @@
-# Plan de Desarrollo: Plataforma Web Hiperlocal de Comercio y Servicios
+# Plan de Desarrollo: Mova — Plataforma Web de Comercio y Servicios Cercanos
 
 ## 1. Visión General del Proyecto
 Plataforma web responsiva (*Mobile-First*) diseñada para que pequeños comerciantes y prestadores de servicios locales (estéticas, barberías, perfumerías, bazares, talleres, etc. — **excluyendo estrictamente comida preparada**) tengan su propia vitrina digital y agenda profesional sin depender del algoritmo de redes sociales.
 
 ### Propuesta de Valor
 * **Para el Negocio:** Gestión de catálogo con inventario en tiempo real, agenda de citas protegida contra cancelaciones mediante anticipos digitales y visibilidad por cercanía geográfica.
-* **Para el Cliente:** Buscador hiperlocal que prioriza negocios, productos y servicios más cercanos a su ubicación GPS, con opciones de compra en línea (recoger en tienda) o apartado para pago en efectivo.
+* **Para el Cliente:** Buscador por cercanía que prioriza negocios, productos y servicios más próximos a su ubicación GPS, con opciones de compra en línea (recoger en tienda) o apartado para pago en efectivo.
 
 ---
 
@@ -37,7 +37,7 @@ El desarrollo debe realizarse **100% en tecnologías nativas/puras** para maximi
   * `CANCELADA_A_TIEMPO` (Antes de $T_{limite}$ configurado por el negocio → 100% reembolsado al monedero interno del cliente).
   * `CANCELADA_TARDE` / `NO_SHOW` (Después de $T_{limite}$ o tras 15 min de tolerancia sin PIN → 100% del anticipo se transfiere al negocio como compensación).
 
-### C. Buscador Hiperlocal
+### C. Buscador por Cercanía
 * Búsqueda unificada por texto (`LIKE` / `FULLTEXT`) sobre nombre de negocio, categoría, título de producto o servicio.
 * Ordenamiento prioritario: `plan_suscripcion DESC` (Pro antes que Básico) y `distancia_km ASC` (más cercanos al usuario primero).
 
@@ -50,7 +50,7 @@ El desarrollo debe realizarse **100% en tecnologías nativas/puras** para maximi
 ## 4. Arquitectura de Carpetas
 
 ```text
-/proyecto-hiperlocal
+/proyecto-mova
 ├── index.html                  # Landing + Buscador principal por cercanía GPS
 ├── negocio.html                # Perfil público del negocio (Tabs: Productos y Servicios)
 ├── panel-negocio.html          # Dashboard privado para gestionar catálogo, apartados y agenda
@@ -78,3 +78,24 @@ El desarrollo debe realizarse **100% en tecnologías nativas/puras** para maximi
 │   └── schema.sql              # Script completo de creación de tablas e índices
 └── uploads/
     └── productos/              # Imágenes subidas por los negocios
+```
+
+---
+
+## 5. Estado de Implementación
+
+- **Etapa 1 — Cimientos, Base de Datos y Acceso:** Completada.
+- **Etapa 2 — Buscador por Cercanía y Vitrina:** Completada.
+- **Etapa 3 — Agenda Blindada y Panel del Negocio:** Completada, incluyendo límite mensual del Plan Básico y procesamiento automático de `no_show`.
+- **Etapa 4 — Portal del Cliente, Fotos y Pulido Visual:** Completada el 19 de noviembre de 2026.
+- **Etapa 5 — Estabilización del Dashboard del Comerciante:** Completada el 19 de noviembre de 2026.
+
+El cierre de la Etapa 4 incluye portal del cliente, carga física segura de imágenes, tickets Click & Collect, ubicación de demostración, transacciones para inventario y monederos, y centralización de colores y estados en `css/variables.css`. El folio de recolección se deriva de forma estable del ID del apartado sin modificar el esquema existente.
+
+La Etapa 5 habilita el alta inicial del perfil de negocio y verifica el funcionamiento integral de Dashboard, Productos, Servicios, Citas y Apartados tanto para Plan Básico como Pro. La siguiente etapa debe definirse antes de iniciar nuevas funcionalidades.
+
+## 6. Datos de demostración ampliados
+
+Para evaluar la portada, la búsqueda por cercanía y los perfiles con una oferta representativa, el archivo `sql/demo_tiendas.sql` agrega de forma idempotente ocho negocios adicionales de barbería, bazar, boutique, taller, servicio técnico, ropa, joyería y comercio local. Incluye 16 productos y 9 servicios, usa coordenadas de prueba en CDMX y excluye comida preparada.
+
+El script puede ejecutarse después de `sql/schema.sql`. Todas las cuentas de negocio demo utilizan la contraseña `Demo1234!`.

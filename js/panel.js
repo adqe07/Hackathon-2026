@@ -11,12 +11,14 @@ import { iniciarCitaConPin, confirmarCita, completarCita, cancelarCita } from '.
 
 // ─── Estado del panel ─────────────────────────────────────────────
 const estado = {
+  usuario:    null,
   negocioId:  null,
   seccion:    'dashboard',
   productos:  [],
   servicios:  [],
   citas:      [],
   apartados:  [],
+  navVinculada: false,
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -32,6 +34,7 @@ export async function initPanel() {
       window.location.href = '/hackathon/login.html?redirect=panel-negocio.html';
       return;
     }
+    estado.usuario = me.usuario;
     estado.negocioId = me.negocio?.id ?? null;
     _renderHeaderUsuario(me.usuario, me.negocio);
   } catch {
@@ -40,6 +43,8 @@ export async function initPanel() {
   }
 
   if (!estado.negocioId) {
+    _bindNavPanel();
+    _setNavDisabled(true);
     _mostrarFormCrearNegocio();
     return;
   }
@@ -50,6 +55,8 @@ export async function initPanel() {
 
 // ─── Navegación del panel ─────────────────────────────────────────
 function _bindNavPanel() {
+  if (estado.navVinculada) return;
+  estado.navVinculada = true;
   document.querySelectorAll('.panel-nav__item[data-seccion]').forEach(item => {
     item.addEventListener('click', () => {
       const seccion = item.dataset.seccion;
@@ -67,6 +74,13 @@ function _bindNavPanel() {
 
   document.getElementById('btn-logout')?.addEventListener('click', manejarLogout);
   document.getElementById('btn-logout-mobile')?.addEventListener('click', manejarLogout);
+}
+
+function _setNavDisabled(disabled) {
+  document.querySelectorAll('.panel-nav__item[data-seccion]').forEach((item) => {
+    item.disabled = disabled;
+    item.setAttribute('aria-disabled', String(disabled));
+  });
 }
 
 async function _activarSeccion(nombre) {
@@ -240,6 +254,7 @@ function _renderProductos() {
 
 function _abrirModalProducto(producto) {
   const esEdicion = !!producto;
+  const uploadFields = document.getElementById('producto-upload-fields')?.innerHTML ?? '';
   const modal = _crearModal(
     esEdicion ? 'Editar producto' : 'Nuevo producto',
     `<form id="form-producto" novalidate>
@@ -264,8 +279,9 @@ function _abrirModalProducto(producto) {
                  value="${producto?.stock_total ?? '0'}">
         </div>
       </div>
+      ${uploadFields}
       <div class="form-group">
-        <label class="form-label">URL de imagen</label>
+        <label class="form-label">URL de imagen (alternativa)</label>
         <input type="url" name="imagen_url" class="form-control" placeholder="https://…"
                value="${_escape(producto?.imagen_url ?? '')}">
         <span class="form-hint">Pega la URL pública de la imagen del producto.</span>
@@ -278,13 +294,33 @@ function _abrirModalProducto(producto) {
     ]
   );
 
+  const inputImagen = modal.querySelector('#producto-imagen');
+  const preview = modal.querySelector('#producto-imagen-preview');
+  if (producto?.imagen_url) {
+    preview.querySelector('img').src = producto.imagen_url;
+    preview.hidden = false;
+  }
+  inputImagen.addEventListener('change', () => {
+    const archivo = inputImagen.files?.[0];
+    if (!archivo) return;
+    const lector = new FileReader();
+    lector.addEventListener('load', () => {
+      preview.querySelector('img').src = lector.result;
+      preview.hidden = false;
+    });
+    lector.readAsDataURL(archivo);
+  });
+
   modal.querySelector('[data-accion="submit"]').addEventListener('click', async () => {
     const form    = modal.querySelector('#form-producto');
     const errEl   = modal.querySelector('#form-prod-error');
     const btn     = modal.querySelector('#btn-guardar-prod');
-    const payload = Object.fromEntries(new FormData(form));
+    const formData = new FormData(form);
+    const titulo = String(formData.get('titulo') ?? '').trim();
+    const precio = String(formData.get('precio') ?? '');
+    const stock = String(formData.get('stock_total') ?? '');
 
-    if (!payload.titulo?.trim() || !payload.precio || !payload.stock_total) {
+    if (!titulo || precio === '' || stock === '') {
       errEl.textContent   = 'Título, precio y stock son obligatorios.';
       errEl.style.display = 'flex';
       return;
@@ -295,14 +331,12 @@ function _abrirModalProducto(producto) {
 
     try {
       if (esEdicion) {
-        await api.post('productos.php', { action: 'editar' }, {
-          id: producto.id, ...payload,
-        });
+        formData.set('id', producto.id);
+        await api.postForm('productos.php', { action: 'editar' }, formData);
         toast('Producto actualizado.', 'success');
       } else {
-        await api.post('productos.php', { action: 'crear' }, {
-          negocio_id: estado.negocioId, ...payload,
-        });
+        formData.set('negocio_id', estado.negocioId);
+        await api.postForm('productos.php', { action: 'crear' }, formData);
         toast('Producto creado.', 'success');
       }
       _cerrarModal(modal);
@@ -759,13 +793,112 @@ function _renderHeaderUsuario(usuario, negocio) {
 
 function _mostrarFormCrearNegocio() {
   const main = document.getElementById('panel-main') ?? document.body;
-  main.innerHTML = `
-    <div class="container container--sm" style="padding-top:var(--space-10);">
+  main.querySelector('#sec-onboarding')?.remove();
+  main.querySelectorAll('.panel-seccion').forEach((seccion) => { seccion.style.display = 'none'; });
+  const onboarding = document.createElement('section');
+  onboarding.id = 'sec-onboarding';
+  onboarding.innerHTML = `
+    <div class="panel-onboarding">
       <h2 class="section-title text-center">Configura tu negocio</h2>
-      <p class="section-subtitle text-center">Antes de continuar, necesitamos los datos básicos de tu negocio.</p>
-      <div class="alert alert--info">ℹ️ Solo necesitas hacer esto una vez.</div>
-      <a href="/hackathon/index.html" class="btn btn--ghost btn--full">Ir al inicio por ahora</a>
+      <p class="section-subtitle text-center">Completa estos datos una sola vez para activar el dashboard.</p>
+      <form id="form-crear-negocio" class="panel-onboarding__form" novalidate>
+        <div class="grid grid--2">
+          <div class="form-group">
+            <label class="form-label">Nombre del negocio <span class="required">*</span></label>
+            <input class="form-control" name="nombre" required maxlength="150">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categoría <span class="required">*</span></label>
+            <select class="form-control" name="categoria" required>
+              <option value="">Selecciona una categoría</option>
+              <option value="estetica">Estética</option><option value="barberia">Barbería</option>
+              <option value="perfumeria">Perfumería</option><option value="bazar">Bazar</option>
+              <option value="boutique">Boutique</option><option value="taller">Taller</option>
+              <option value="tecnico">Servicio técnico</option><option value="ropa">Ropa</option>
+              <option value="joyeria">Joyería</option><option value="comercio">Comercio general</option>
+              <option value="otro">Otro comercio (sin comida preparada)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descripción</label>
+          <textarea class="form-control" name="descripcion" rows="3" maxlength="2000"></textarea>
+        </div>
+        <div class="grid grid--2">
+          <div class="form-group"><label class="form-label">Teléfono</label><input class="form-control" name="telefono_contacto" maxlength="20"></div>
+          <div class="form-group"><label class="form-label">Ciudad</label><input class="form-control" name="ciudad" maxlength="100"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Dirección</label><input class="form-control" name="direccion" maxlength="300"></div>
+        <fieldset class="panel-onboarding__location">
+          <legend>Ubicación para ordenar por cercanía</legend>
+          <div class="grid grid--2">
+            <div class="form-group"><label class="form-label">Latitud</label><input class="form-control" name="latitud" id="negocio-latitud" type="number" step="0.00000001" min="-90" max="90"></div>
+            <div class="form-group"><label class="form-label">Longitud</label><input class="form-control" name="longitud" id="negocio-longitud" type="number" step="0.00000001" min="-180" max="180"></div>
+          </div>
+          <button class="btn btn--ghost btn--sm" type="button" id="btn-ubicacion-negocio">Usar mi ubicación actual</button>
+          <span id="ubicacion-negocio-estado" class="form-hint"></span>
+        </fieldset>
+        <div class="form-group">
+          <label class="form-label">Cancelación sin penalización</label>
+          <select class="form-control" name="ventana_cancelacion_horas">
+            <option value="3">3 horas antes</option><option value="12">12 horas antes</option>
+            <option value="24" selected>24 horas antes</option><option value="48">48 horas antes</option>
+          </select>
+        </div>
+        <div id="crear-negocio-error" class="alert alert--danger" hidden></div>
+        <button class="btn btn--primary btn--full btn--lg" id="btn-crear-negocio" type="submit">Activar mi dashboard</button>
+      </form>
     </div>`;
+  main.prepend(onboarding);
+
+  document.getElementById('btn-ubicacion-negocio').addEventListener('click', _capturarUbicacionNegocio);
+  document.getElementById('form-crear-negocio').addEventListener('submit', _crearNegocioDesdeFormulario);
+}
+
+function _capturarUbicacionNegocio() {
+  const estadoEl = document.getElementById('ubicacion-negocio-estado');
+  if (!navigator.geolocation) {
+    estadoEl.textContent = 'Tu navegador no ofrece geolocalización.';
+    return;
+  }
+  estadoEl.textContent = 'Obteniendo ubicación…';
+  navigator.geolocation.getCurrentPosition((posicion) => {
+    document.getElementById('negocio-latitud').value = posicion.coords.latitude.toFixed(8);
+    document.getElementById('negocio-longitud').value = posicion.coords.longitude.toFixed(8);
+    estadoEl.textContent = 'Ubicación capturada correctamente.';
+  }, () => {
+    estadoEl.textContent = 'No se pudo obtener la ubicación. Puedes escribirla manualmente.';
+  }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 });
+}
+
+async function _crearNegocioDesdeFormulario(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const errorEl = document.getElementById('crear-negocio-error');
+  const boton = document.getElementById('btn-crear-negocio');
+  const payload = Object.fromEntries(new FormData(form));
+
+  if (!payload.nombre.trim() || !payload.categoria) {
+    errorEl.textContent = 'Nombre y categoría son obligatorios.';
+    errorEl.hidden = false;
+    return;
+  }
+
+  errorEl.hidden = true;
+  btnLoading(boton, true);
+  try {
+    const data = await api.post('negocios.php', { action: 'crear' }, payload);
+    estado.negocioId = data.negocio.id;
+    document.getElementById('sec-onboarding')?.remove();
+    _renderHeaderUsuario(estado.usuario, data.negocio);
+    _setNavDisabled(false);
+    toast('Negocio configurado. Tu dashboard ya está activo.', 'success');
+    await _activarSeccion('dashboard');
+  } catch (error) {
+    errorEl.textContent = error.message;
+    errorEl.hidden = false;
+    btnLoading(boton, false, 'Activar mi dashboard');
+  }
 }
 
 function _escape(str) {

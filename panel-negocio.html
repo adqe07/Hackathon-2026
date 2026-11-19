@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel de Negocio | Hiperlocal</title>
+  <title>Panel de Negocio | Mova</title>
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/componentes.css">
@@ -15,7 +15,7 @@
   <div class="container">
     <a href="index.html" class="logo">
       <span class="logo__icon">📍</span>
-      Hiperlocal
+      Mova
     </a>
     <nav class="header-nav">
       <div id="panel-usuario-info" style="font-size:var(--text-sm);text-align:right;"></div>
@@ -76,7 +76,7 @@
 </div>
 
 <!-- NAV INFERIOR MOBILE (Panel) -->
-<nav class="bottom-nav" aria-label="Navegación del panel">
+<nav class="bottom-nav panel-bottom-nav" aria-label="Navegación del panel">
   <button class="bottom-nav__item panel-nav__item" data-seccion="dashboard">
     <span class="icon">📊</span><span>Dashboard</span>
   </button>
@@ -89,10 +89,24 @@
   <button class="bottom-nav__item panel-nav__item" data-seccion="servicios">
     <span class="icon">💇</span><span>Servicios</span>
   </button>
+  <button class="bottom-nav__item panel-nav__item" data-seccion="apartados">
+    <span class="icon">🛍️</span><span>Apartados</span>
+  </button>
   <button class="bottom-nav__item" id="btn-logout-mobile" style="color:var(--color-danger);">
     <span class="icon">🚪</span><span>Salir</span>
   </button>
 </nav>
+
+<template id="producto-upload-fields">
+  <div class="form-group">
+    <label class="form-label" for="producto-imagen">Imagen (JPEG, PNG o WebP; máximo 3 MB)</label>
+    <input type="file" id="producto-imagen" name="imagen" class="form-control"
+           accept="image/jpeg,image/png,image/webp">
+    <div class="upload-preview" id="producto-imagen-preview" hidden>
+      <img alt="Vista previa de la imagen">
+    </div>
+  </div>
+</template>
 
 <script type="module">
   import { initPanel } from './js/panel.js';
