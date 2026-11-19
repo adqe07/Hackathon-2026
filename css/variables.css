@@ -1,0 +1,199 @@
+/* =============================================================================
+   css/variables.css
+   SISTEMA DE DISEÑO & DESIGN TOKENS
+   Plataforma Hiperlocal | Mobile-First & Responsive
+
+   GUÍA RÁPIDA PARA EL ENCARGADO DE DISEÑO:
+   1. Para cambiar la identidad visual de toda la app, edita la sección
+      "CONTROL MAESTRO DE MARCA" justo abajo.
+   2. Para probar otros estilos al instante, revisa la sección "PRESETS DE TEMAS".
+   3. Todos los componentes (botones, tarjetas, badges, modales) heredan
+      automáticamente estos valores.
+   ============================================================================= */
+
+:root {
+  /* ===========================================================================
+     1. CONTROL MAESTRO DE MARCA (Cambia estos valores para rebrandear la app)
+     =========================================================================== */
+  --color-primary:        #6C63FF;   /* Color dominante: botones principales, links, iconos */
+  --color-primary-dark:   #574FCC;   /* Hover de botones y estados presionados */
+  --color-primary-light:  #EAE9FF;   /* Fondos suaves, badges y estados activos de menú */
+  
+  --color-secondary:      #FF6584;   /* Color de acento: precios especiales, llamadas de atención */
+  --color-secondary-dark: #E04E6A;   /* Hover de elementos secundarios */
+
+  /* Gradiente decorativo del banner principal / Hero */
+  --hero-gradient-start:  #6C63FF;
+  --hero-gradient-end:    #9C6FFF;
+
+  /* Redondez global de elementos */
+  --card-radius:          1rem;      /* 16px: Bordes de tarjetas de productos y negocios */
+  --btn-radius:           0.5rem;    /* 8px: Bordes de botones */
+  --input-radius:         0.5rem;    /* 8px: Bordes de campos de formulario */
+
+  /* ===========================================================================
+     2. ESCALA DE SUPERFICIES Y FONDOS
+     =========================================================================== */
+  --color-bg:             #F7F8FC;   /* Fondo general de la aplicación */
+  --color-surface:        #FFFFFF;   /* Fondo de tarjetas, headers y modales */
+  --color-surface-alt:    #F0F1F7;   /* Fondos secundarios, placeholders e inputs neutros */
+  --color-border:         #E2E5F0;   /* Líneas divisorias y bordes sutiles */
+  
+  /* Textos y contrastes */
+  --color-text:           #1A1D2E;   /* Texto principal (alta legibilidad) */
+  --color-text-muted:     #6B7280;   /* Subtítulos, fechas, categorías */
+  --color-text-light:     #9CA3AF;   /* Placeholders e iconos secundarios */
+
+  /* ===========================================================================
+     3. ESTADOS SEMÁNTICOS (Feedback visual)
+     =========================================================================== */
+  --color-success:        #22C55E;   /* Éxito, citas completadas, disponible */
+  --color-success-bg:     #DCFCE7;
+  --color-warning:        #F59E0B;   /* Advertencias, citas pendientes, anticipos */
+  --color-warning-bg:     #FEF3C7;
+  --color-danger:         #EF4444;   /* Errores, stock agotado, cancelaciones */
+  --color-danger-bg:      #FEE2E2;
+  --color-info:           #3B82F6;   /* Información general y notificaciones */
+  --color-info-bg:        #DBEAFE;
+
+  /* ===========================================================================
+     4. BADGES DE ESTADO (Citas y Apartados)
+     =========================================================================== */
+  --badge-pendiente-pago:   #F59E0B;
+  --badge-agendada:         #3B82F6;
+  --badge-confirmada:       #6C63FF;
+  --badge-en-curso:         #8B5CF6;
+  --badge-completada:       #22C55E;
+  --badge-cancelada-tiempo: #6B7280;
+  --badge-cancelada-tarde:  #EF4444;
+  --badge-no-show:          #DC2626;
+
+  /* Distintivos de Planes */
+  --color-plan-basico:      #6B7280;
+  --color-plan-pro:         #F59E0B;
+
+  /* ===========================================================================
+     5. TIPOGRAFÍA
+     (Para cambiar de fuente, importa tu Google Font y colócala aquí)
+     =========================================================================== */
+  --font-sans:   'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont,
+                 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:   'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+  /* Jerarquía de tamaños */
+  --text-xs:    0.75rem;    /* 12px */
+  --text-sm:    0.875rem;   /* 14px */
+  --text-base:  1rem;       /* 16px */
+  --text-lg:    1.125rem;   /* 18px */
+  --text-xl:    1.25rem;    /* 20px */
+  --text-2xl:   1.5rem;     /* 24px */
+  --text-3xl:   1.875rem;   /* 30px */
+  --text-4xl:   2.25rem;    /* 36px */
+
+  --weight-normal:   400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  --leading-tight:   1.25;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.75;
+
+  /* ===========================================================================
+     6. ESPACIADO MODULAR (Escala de 4px)
+     =========================================================================== */
+  --space-1:  0.25rem;   /*  4px */
+  --space-2:  0.5rem;    /*  8px */
+  --space-3:  0.75rem;   /* 12px */
+  --space-4:  1rem;      /* 16px */
+  --space-5:  1.25rem;   /* 20px */
+  --space-6:  1.5rem;    /* 24px */
+  --space-8:  2rem;      /* 32px */
+  --space-10: 2.5rem;    /* 40px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
+  --space-20: 5rem;      /* 80px */
+
+  /* ===========================================================================
+     7. RADIOS Y SOMBRAS DETALLADAS
+     =========================================================================== */
+  --radius-sm:  var(--btn-radius);
+  --radius-md:  var(--input-radius);
+  --radius-lg:  0.75rem;
+  --radius-xl:  var(--card-radius);
+  --radius-2xl: 1.5rem;
+  --radius-full:9999px;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-lg:  0 10px 30px rgba(0,0,0,0.11), 0 4px 10px rgba(0,0,0,0.06);
+  --shadow-xl:  0 20px 50px rgba(0,0,0,0.14), 0 8px 20px rgba(0,0,0,0.07);
+
+  /* Transiciones estándar */
+  --transition-fast:   150ms ease;
+  --transition-base:   250ms ease;
+  --transition-slow:   400ms ease;
+
+  /* Layout */
+  --max-width-sm:   640px;
+  --max-width-md:   768px;
+  --max-width-lg:   1024px;
+  --max-width-xl:   1280px;
+  --header-height:  60px;
+  --bottom-nav-h:   64px;
+}
+
+/* =============================================================================
+   PRESETS DE TEMAS OPCIONALES (El diseñador puede descomentar uno de estos bloques)
+   ============================================================================= */
+
+/* --- TEMA 1: ESMERALDA & ORO (Estilo sofisticado / Boutiques / Spa) ---
+:root {
+  --color-primary:        #0F766E;
+  --color-primary-dark:   #115E59;
+  --color-primary-light:  #CCFBF1;
+  --color-secondary:      #D97706;
+  --color-secondary-dark: #B45309;
+  --hero-gradient-start:  #0F766E;
+  --hero-gradient-end:    #14B8A6;
+}
+*/
+
+/* --- TEMA 2: CORAL SUNSET (Cálido / Dinámico) ---
+:root {
+  --color-primary:        #FF5722;
+  --color-primary-dark:   #E64A19;
+  --color-primary-light:  #FBE9E7;
+  --color-secondary:      #26A69A;
+  --color-secondary-dark: #00897B;
+  --hero-gradient-start:  #FF5722;
+  --hero-gradient-end:    #FF8A65;
+}
+*/
+
+/* --- TEMA 3: BLUE TECH MODERNO (Limpio y corporativo) ---
+:root {
+  --color-primary:        #2563EB;
+  --color-primary-dark:   #1D4ED8;
+  --color-primary-light:  #EFF6FF;
+  --color-secondary:      #EC4899;
+  --color-secondary-dark: #DB2777;
+  --hero-gradient-start:  #1E40AF;
+  --hero-gradient-end:    #3B82F6;
+}
+*/
+
+/* =============================================================================
+   SOPORTE DE MODO OSCURO (Respeta preferencia del sistema del usuario)
+   ============================================================================= */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg:          #0F1117;
+    --color-surface:     #1A1D2E;
+    --color-surface-alt: #242740;
+    --color-border:      #2D3148;
+    --color-text:        #F1F3FA;
+    --color-text-muted:  #9CA3AF;
+    --color-text-light:  #6B7280;
+  }
+}

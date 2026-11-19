@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Encuentra negocios locales cercanos a ti: estéticas, barberías, perfumerías, bazares y más.">
+  <title>Hiperlocal — Comercio y Servicios Cercanos</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/componentes.css">
+  <style>
+    /* Estilos específicos del hero de la landing */
+    .hero {
+      background: linear-gradient(135deg, var(--hero-gradient-start, var(--color-primary)) 0%, var(--hero-gradient-end, #9C6FFF) 100%);
+      color: #fff;
+      padding: var(--space-10) 0 var(--space-16);
+      text-align: center;
+    }
+    .hero h1 { color: #fff; font-size: clamp(1.8rem, 5vw, 3rem); margin-bottom: var(--space-4); }
+    .hero p  { font-size: var(--text-lg); opacity: 0.9; max-width: 500px; margin: 0 auto var(--space-8); }
+    .hero .search-bar { max-width: 560px; margin: 0 auto; }
+    .resultados-section { padding: var(--space-6) 0 var(--space-10); }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══════════════════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <span class="logo__icon">📍</span>
+      Hiperlocal
+    </a>
+    <nav class="header-nav" aria-label="Navegación principal">
+      <div id="nav-auth">
+        <!-- Se inyecta dinámicamente desde JS -->
+        <a href="login.html" class="btn btn--secondary btn--sm">Entrar</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ══ HERO + BUSCADOR ═════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="container">
+    <h1>Negocios locales,<br>a pasos de ti</h1>
+    <p>Estéticas, perfumerías, bazares, talleres y más. Aparta, agenda y paga sin moverte.</p>
+
+    <div class="search-bar">
+      <span class="search-bar__icon" aria-hidden="true">🔍</span>
+      <input
+        type="search"
+        id="search-input"
+        class="search-bar__input"
+        placeholder="Busca un negocio, producto o servicio…"
+        aria-label="Buscar negocios"
+        autocomplete="off"
+      >
+      <button id="search-btn" class="search-bar__btn" aria-label="Buscar">Buscar</button>
+    </div>
+
+    <div style="margin-top:var(--space-4);">
+      <button id="btn-ubicacion" class="btn btn--ghost btn--sm" style="color:#fff;border-color:rgba(255,255,255,0.4);">
+        📍 Usar mi ubicación
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FILTROS DE CATEGORÍA ════════════════════════════════════════ -->
+<div style="background:var(--color-surface);border-bottom:1px solid var(--color-border);padding:var(--space-3) 0;position:sticky;top:var(--header-height);z-index:50;">
+  <div class="container">
+    <div class="categoria-chips" id="categoria-chips" role="list" aria-label="Filtrar por categoría">
+      <button class="chip" data-categoria="estetica" role="listitem">💇 Estética</button>
+      <button class="chip" data-categoria="barberia" role="listitem">✂️ Barbería</button>
+      <button class="chip" data-categoria="perfumeria" role="listitem">🌸 Perfumería</button>
+      <button class="chip" data-categoria="bazar" role="listitem">🛍️ Bazar</button>
+      <button class="chip" data-categoria="taller" role="listitem">🔧 Taller</button>
+      <button class="chip" data-categoria="ropa" role="listitem">👗 Ropa</button>
+      <button class="chip" data-categoria="joyeria" role="listitem">💍 Joyería</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RESULTADOS ══════════════════════════════════════════════════ -->
+<main class="main-content">
+  <section class="resultados-section">
+    <div class="container">
+      <div class="flex items-center justify-between mb-4" style="flex-wrap:wrap;gap:var(--space-3);">
+        <p id="result-count" class="text-sm text-muted" aria-live="polite"></p>
+      </div>
+
+      <div class="grid grid--auto" id="negocios-grid" aria-live="polite" aria-label="Lista de negocios">
+        <!-- Se llena dinámicamente -->
+      </div>
+
+      <div style="text-align:center;margin-top:var(--space-8);">
+        <button id="btn-ver-mas" class="btn btn--secondary" style="display:none;">
+          Ver más negocios
+        </button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ══ NAV INFERIOR (mobile) ═══════════════════════════════════════ -->
+<nav class="bottom-nav" aria-label="Navegación móvil">
+  <a href="index.html" class="bottom-nav__item active">
+    <span class="icon" aria-hidden="true">🏠</span>
+    <span>Inicio</span>
+  </a>
+  <a href="index.html#buscar" class="bottom-nav__item">
+    <span class="icon" aria-hidden="true">🔍</span>
+    <span>Buscar</span>
+  </a>
+  <a href="login.html" class="bottom-nav__item" id="nav-mis-citas">
+    <span class="icon" aria-hidden="true">🗓</span>
+    <span>Mis Citas</span>
+  </a>
+  <a href="login.html" class="bottom-nav__item" id="nav-perfil">
+    <span class="icon" aria-hidden="true">👤</span>
+    <span>Perfil</span>
+  </a>
+</nav>
+
+<!-- ══ SCRIPTS ════════════════════════════════════════════════════ -->
+<script type="module">
+  import { initBuscador } from './js/buscador.js';
+  import { api, toast }   from './js/api.js';
+
+  // ── Inicializar buscador ──────────────────────────────────────
+  initBuscador();
+
+  // ── Verificar sesión para personalizar nav ────────────────────
+  (async () => {
+    try {
+      const me = await api.get('auth.php', { action: 'me' });
+      if (me.autenticado) {
+        const navAuth = document.getElementById('nav-auth');
+        navAuth.innerHTML = `
+          <div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;">
+            <span class="text-sm text-muted">Hola, <strong>${me.usuario.nombre.split(' ')[0]}</strong></span>
+            ${me.usuario.rol === 'negocio'
+              ? `<a href="panel-negocio.html" class="btn btn--primary btn--sm">🏪 Mi panel</a>`
+              : ''}
+            <button id="btn-logout" class="btn btn--ghost btn--sm">Cerrar sesión</button>
+          </div>`;
+
+        document.getElementById('btn-logout')?.addEventListener('click', async (e) => {
+          e.preventDefault();
+          try {
+            await api.post('auth.php', { action: 'logout' });
+          } catch {}
+          window.location.href = 'login.html';
+        });
+
+        // Actualizar nav mobile
+        if (me.usuario.rol === 'negocio') {
+          document.getElementById('nav-mis-citas').href = 'panel-negocio.html';
+          document.getElementById('nav-mis-citas').querySelector('span:first-child').textContent = '🏪';
+          document.getElementById('nav-mis-citas').querySelector('span:last-child').textContent  = 'Mi Panel';
+        }
+        const navPerfil = document.getElementById('nav-perfil');
+        navPerfil.href = '#';
+        navPerfil.addEventListener('click', async (e) => {
+          e.preventDefault();
+          if (confirm(`¿Cerrar sesión de ${me.usuario.nombre}?`)) {
+            try { await api.post('auth.php', { action: 'logout' }); } catch {}
+            window.location.href = 'login.html';
+          }
+        });
+      }
+    } catch { /* Sin sesión, mostramos botón de Entrar */ }
+  })();
+</script>
+
+</body>
+</html>

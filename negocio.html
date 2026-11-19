@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Perfil público del negocio — productos y servicios disponibles.">
+  <title>Negocio | Hiperlocal</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/componentes.css">
+  <style>
+    .negocio-cover {
+      width: 100%;
+      aspect-ratio: 16/5;
+      object-fit: cover;
+      background: linear-gradient(135deg, var(--color-primary-light), var(--color-surface-alt));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+    }
+    .negocio-perfil-header {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-5) 0;
+    }
+    .negocio-perfil-header .container {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-5);
+    }
+    .negocio-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: var(--radius-xl);
+      object-fit: cover;
+      border: 3px solid var(--color-surface);
+      box-shadow: var(--shadow-md);
+      flex-shrink: 0;
+      background: var(--color-primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <span class="logo__icon">📍</span>
+      Hiperlocal
+    </a>
+    <nav class="header-nav">
+      <a href="index.html" class="btn btn--ghost btn--sm">← Volver</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main-content">
+
+  <!-- COVER DEL NEGOCIO -->
+  <div id="negocio-cover" class="negocio-cover" aria-hidden="true">🏪</div>
+
+  <!-- INFO PRINCIPAL -->
+  <div class="negocio-perfil-header">
+    <div class="container">
+      <div id="negocio-logo" class="negocio-logo">🏪</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;">
+          <h1 id="negocio-nombre" style="font-size:var(--text-2xl);margin:0;">Cargando…</h1>
+          <span id="negocio-verificado" style="display:none;" title="Negocio verificado" aria-label="Verificado">✓</span>
+          <span id="negocio-plan-badge"></span>
+        </div>
+        <p id="negocio-categoria" class="text-sm text-muted" style="margin:var(--space-1) 0 var(--space-2);"></p>
+        <div style="display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;font-size:var(--text-sm);color:var(--color-text-muted);">
+          <span id="negocio-distancia" style="display:none;font-weight:var(--weight-semibold);color:var(--color-primary);">📍</span>
+          <span id="negocio-telefono" style="display:none;">📞</span>
+          <span id="negocio-ciudad" style="display:none;">🏙</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESCRIPCIÓN -->
+  <div class="container" style="padding-top:var(--space-5);">
+    <p id="negocio-descripcion" class="text-muted" style="max-width:680px;"></p>
+  </div>
+
+  <!-- TABS: Productos / Servicios -->
+  <div class="container" style="padding-top:var(--space-4);">
+    <div class="tabs" role="tablist" aria-label="Catálogo del negocio">
+      <button class="tab-btn active" role="tab" aria-selected="true"
+              aria-controls="tab-productos" data-tab="productos" id="tbtn-productos">
+        📦 Productos
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false"
+              aria-controls="tab-servicios" data-tab="servicios" id="tbtn-servicios">
+        💇 Servicios
+      </button>
+    </div>
+
+    <!-- Panel Productos -->
+    <div class="tab-panel active" id="tab-productos" role="tabpanel" aria-labelledby="tbtn-productos">
+      <div id="productos-grid" class="grid grid--auto">
+        <div style="grid-column:1/-1;text-align:center;padding:var(--space-8);">
+          <span class="spinner"></span> Cargando productos…
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel Servicios -->
+    <div class="tab-panel" id="tab-servicios" role="tabpanel" aria-labelledby="tbtn-servicios">
+      <div id="servicios-lista" style="display:flex;flex-direction:column;gap:var(--space-3);">
+        <div style="text-align:center;padding:var(--space-8);">
+          <span class="spinner"></span> Cargando servicios…
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODAL APARTADO/COMPRA -->
+<div class="modal-backdrop" id="modal-apartado" aria-modal="true" role="dialog" aria-label="Apartar producto">
+  <div class="modal">
+    <div class="modal__handle"></div>
+    <div class="modal__header">
+      <h3 class="modal__title">Apartar producto</h3>
+      <button class="modal__close" id="modal-apartado-close" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal__body" id="modal-apartado-body"></div>
+  </div>
+</div>
+
+<!-- MODAL AGENDAR CITA -->
+<div class="modal-backdrop" id="modal-agenda" aria-modal="true" role="dialog" aria-label="Agendar cita">
+  <div class="modal modal--lg">
+    <div class="modal__handle"></div>
+    <div class="modal__header">
+      <h3 class="modal__title" id="modal-agenda-titulo">Agendar cita</h3>
+      <button class="modal__close" id="modal-agenda-close" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal__body" id="modal-agenda-body"></div>
+  </div>
+</div>
+
+<!-- NAV MOBILE -->
+<nav class="bottom-nav" aria-label="Navegación móvil">
+  <a href="index.html" class="bottom-nav__item">
+    <span class="icon">🏠</span><span>Inicio</span>
+  </a>
+  <a href="index.html" class="bottom-nav__item">
+    <span class="icon">🔍</span><span>Buscar</span>
+  </a>
+  <a href="login.html" class="bottom-nav__item">
+    <span class="icon">🗓</span><span>Mis Citas</span>
+  </a>
+  <a href="login.html" class="bottom-nav__item">
+    <span class="icon">👤</span><span>Perfil</span>
+  </a>
+</nav>
+
+<script type="module">
+  import { api, ApiError, formatMXN, formatFecha, toast, btnLoading } from './js/api.js';
+  import { AgendaCalendario } from './js/agenda.js';
+  import { geo, Geolocalizacion } from './js/geolocalizacion.js';
+
+  // ── Leer negocio_id de la URL ─────────────────────────────────
+  const params    = new URLSearchParams(window.location.search);
+  const negocioId = parseInt(params.get('id'));
+
+  if (!negocioId) {
+    window.location.href = 'index.html';
+  }
+
+  // ── Tabs ──────────────────────────────────────────────────────
+  document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+    });
+  });
+
+  // ── Modales ───────────────────────────────────────────────────
+  const modalApartado = document.getElementById('modal-apartado');
+  const modalAgenda   = document.getElementById('modal-agenda');
+
+  document.getElementById('modal-apartado-close').addEventListener('click', () => cerrarModal(modalApartado));
+  document.getElementById('modal-agenda-close').addEventListener('click',   () => cerrarModal(modalAgenda));
+
+  [modalApartado, modalAgenda].forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) cerrarModal(m); });
+  });
+
+  function abrirModal(modal) {
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarModal(modal) {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ── Cargar datos del negocio ──────────────────────────────────
+  let negocioData = null;
+
+  async function cargarNegocio() {
+    try {
+      const coords = await geo.obtenerPosicion();
+
+      const data = await api.get('negocios.php', {
+        action: 'perfil',
+        id:     negocioId,
+        lat:    coords.lat,
+        lon:    coords.lon,
+      });
+
+      negocioData = data.negocio;
+      _renderPerfil(negocioData, coords);
+      await Promise.all([cargarProductos(), cargarServicios()]);
+    } catch (err) {
+      document.getElementById('negocio-nombre').textContent = 'Negocio no encontrado';
+    }
+  }
+
+  function _renderPerfil(n, coords) {
+    document.title = `${n.nombre} | Hiperlocal`;
+    document.getElementById('negocio-nombre').textContent    = n.nombre;
+    document.getElementById('negocio-descripcion').textContent = n.descripcion ?? '';
+
+    // Categoría
+    const catEl = document.getElementById('negocio-categoria');
+    catEl.textContent = n.categoria ?? '';
+
+    // Verificado
+    if (n.verificado) {
+      const v = document.getElementById('negocio-verificado');
+      v.style.display = 'inline';
+      v.style.color = 'var(--color-primary)';
+      v.style.fontWeight = 'bold';
+    }
+
+    // Plan badge
+    document.getElementById('negocio-plan-badge').innerHTML =
+      n.plan_suscripcion === 'pro'
+        ? `<span class="badge badge--pro">Pro</span>`
+        : `<span class="badge badge--basico">Básico</span>`;
+
+    // Distancia
+    if (n.distancia_km != null) {
+      const dEl = document.getElementById('negocio-distancia');
+      dEl.style.display = 'inline';
+      dEl.textContent = `📍 ${Geolocalizacion.formatDistancia(parseFloat(n.distancia_km))}`;
+    }
+
+    // Teléfono
+    if (n.telefono_contacto) {
+      const tEl = document.getElementById('negocio-telefono');
+      tEl.style.display = 'inline';
+      tEl.innerHTML = `📞 <a href="tel:${n.telefono_contacto}">${n.telefono_contacto}</a>`;
+    }
+
+    // Ciudad
+    if (n.ciudad) {
+      const cEl = document.getElementById('negocio-ciudad');
+      cEl.style.display = 'inline';
+      cEl.textContent = `🏙 ${n.ciudad}`;
+    }
+  }
+
+  // ── Productos ─────────────────────────────────────────────────
+  async function cargarProductos() {
+    const grid = document.getElementById('productos-grid');
+    try {
+      const data = await api.get('productos.php', { action: 'listar', negocio_id: negocioId });
+      const productos = data.productos ?? [];
+
+      if (!productos.length) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1;">
+            <div class="empty-state__icon">📦</div>
+            <div class="empty-state__title">Sin productos</div>
+            <p class="empty-state__desc">Este negocio aún no ha publicado productos.</p>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = productos.map(p => `
+        <article class="producto-card">
+          <div class="producto-card__img">
+            ${p.imagen_url
+              ? `<img src="${esc(p.imagen_url)}" alt="${esc(p.titulo)}" loading="lazy">`
+              : `<div class="producto-card__img-placeholder">📦</div>`}
+            <div class="producto-card__stock-badge${p.stock_disponible == 0 ? ' agotado' : ''}">
+              ${p.stock_disponible == 0 ? '¡Agotado!' : `${p.stock_disponible} disponible${p.stock_disponible != 1 ? 's' : ''}`}
+            </div>
+          </div>
+          <div class="producto-card__body">
+            <div class="producto-card__titulo">${esc(p.titulo)}</div>
+            <div class="producto-card__precio"><span class="moneda">$</span>${parseFloat(p.precio).toFixed(2)}</div>
+            <div class="producto-card__acciones">
+              <button class="btn btn--primary btn--sm btn-apartar"
+                data-id="${p.id}"
+                data-titulo="${esc(p.titulo)}"
+                data-precio="${p.precio}"
+                data-stock="${p.stock_disponible}"
+                ${p.stock_disponible == 0 ? 'disabled' : ''}>
+                ${p.stock_disponible == 0 ? 'Agotado' : '🛒 Apartar'}
+              </button>
+            </div>
+          </div>
+        </article>`).join('');
+
+      grid.querySelectorAll('.btn-apartar').forEach(btn => {
+        btn.addEventListener('click', () => _abrirModalApartado({
+          id:     parseInt(btn.dataset.id),
+          titulo: btn.dataset.titulo,
+          precio: parseFloat(btn.dataset.precio),
+          stock:  parseInt(btn.dataset.stock),
+        }));
+      });
+    } catch (err) {
+      grid.innerHTML = `<div class="alert alert--danger" style="grid-column:1/-1;">Error al cargar productos.</div>`;
+    }
+  }
+
+  function _abrirModalApartado(producto) {
+    const body = document.getElementById('modal-apartado-body');
+    body.innerHTML = `
+      <p style="font-size:var(--text-lg);font-weight:var(--weight-bold);margin-bottom:var(--space-4);">
+        ${esc(producto.titulo)}
+      </p>
+      <p class="text-muted text-sm" style="margin-bottom:var(--space-5);">
+        Precio: <strong>${formatMXN(producto.precio)}</strong>
+      </p>
+      <div class="form-group">
+        <label class="form-label">Modalidad de pago</label>
+        <select id="tipo-pago" class="form-control">
+          <option value="efectivo_tienda">💵 Efectivo en tienda (válido 3 horas)</option>
+          ${negocioData?.plan_suscripcion === 'pro'
+            ? `<option value="online">💳 Pago en línea (Click &amp; Collect)</option>`
+            : ''}
+        </select>
+        ${negocioData?.plan_suscripcion !== 'pro'
+          ? `<span class="form-hint">Este negocio solo acepta pago en efectivo.</span>`
+          : ''}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notas (opcional)</label>
+        <input type="text" id="notas-apartado" class="form-control" placeholder="Ej: color azul, talla M…" maxlength="300">
+      </div>
+      <div id="apartado-error" class="alert alert--danger" style="display:none;"></div>
+      <div class="alert alert--warning" style="margin-bottom:0;">
+        ⏰ El apartado en efectivo expira automáticamente a las <strong>3 horas</strong> si no confirmas el pago en tienda.
+      </div>
+      <div class="modal__footer" style="padding:var(--space-5) 0 0;border:none;">
+        <button id="btn-confirmar-apartado" class="btn btn--primary btn--full btn--lg">
+          Confirmar apartado
+        </button>
+      </div>`;
+
+    abrirModal(modalApartado);
+
+    document.getElementById('btn-confirmar-apartado').addEventListener('click', async (e) => {
+      const btn    = e.currentTarget;
+      const errEl  = document.getElementById('apartado-error');
+      const tipo   = document.getElementById('tipo-pago').value;
+      const notas  = document.getElementById('notas-apartado').value.trim();
+      errEl.style.display = 'none';
+      btnLoading(btn, true);
+
+      try {
+        await api.post('productos.php', { action: 'apartar' }, {
+          producto_id: producto.id,
+          negocio_id:  negocioId,
+          tipo_pago:   tipo,
+          notas_cliente: notas || null,
+        });
+        cerrarModal(modalApartado);
+        toast(`¡Producto apartado! ${tipo === 'efectivo_tienda' ? 'Tienes 3 horas para ir a pagar.' : 'Procede con el pago online.'}`, 'success', 5000);
+        cargarProductos(); // Refrescar stock
+      } catch (err) {
+        errEl.textContent   = err.message;
+        errEl.style.display = 'flex';
+        btnLoading(btn, false);
+      }
+    });
+  }
+
+  // ── Servicios ─────────────────────────────────────────────────
+  async function cargarServicios() {
+    const lista = document.getElementById('servicios-lista');
+    try {
+      const data = await api.get('productos.php', { action: 'servicios', negocio_id: negocioId });
+      const servicios = data.servicios ?? [];
+
+      if (!servicios.length) {
+        lista.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__icon">🗓</div>
+            <div class="empty-state__title">Sin servicios</div>
+            <p class="empty-state__desc">Este negocio aún no ha configurado servicios para agendar.</p>
+          </div>`;
+        return;
+      }
+
+      lista.innerHTML = servicios.map(s => `
+        <article class="servicio-card">
+          <div class="servicio-card__header">
+            <div class="servicio-card__nombre">${esc(s.nombre)}</div>
+            <div class="servicio-card__duracion">⏱ ${s.duracion_minutos} min</div>
+          </div>
+          ${s.descripcion ? `<p class="servicio-card__desc">${esc(s.descripcion)}</p>` : ''}
+          <div class="servicio-card__footer">
+            <div class="servicio-card__precios">
+              <div class="servicio-card__precio-estimado">${formatMXN(s.precio_estimado)}</div>
+              <div class="servicio-card__anticipo">Anticipo: <strong>${formatMXN(s.monto_anticipo)}</strong></div>
+            </div>
+            <button class="btn btn--primary btn-agendar"
+              data-id="${s.id}"
+              data-nombre="${esc(s.nombre)}"
+              data-duracion="${s.duracion_minutos}"
+              data-precio="${s.precio_estimado}"
+              data-anticipo="${s.monto_anticipo}">
+              🗓 Agendar
+            </button>
+          </div>
+        </article>`).join('');
+
+      lista.querySelectorAll('.btn-agendar').forEach(btn => {
+        btn.addEventListener('click', () => _abrirModalAgenda({
+          id:               parseInt(btn.dataset.id),
+          nombre:           btn.dataset.nombre,
+          duracionMinutos:  parseInt(btn.dataset.duracion),
+          precioEstimado:   parseFloat(btn.dataset.precio),
+          montoAnticipo:    parseFloat(btn.dataset.anticipo),
+        }));
+      });
+    } catch {
+      lista.innerHTML = `<div class="alert alert--danger">Error al cargar servicios.</div>`;
+    }
+  }
+
+  function _abrirModalAgenda(servicio) {
+    document.getElementById('modal-agenda-titulo').textContent = `Agendar: ${servicio.nombre}`;
+    const body = document.getElementById('modal-agenda-body');
+    body.innerHTML = '';
+
+    new AgendaCalendario({
+      negocioId:       negocioId,
+      servicioId:      servicio.id,
+      duracionMinutos: servicio.duracionMinutos,
+      precioEstimado:  servicio.precioEstimado,
+      montoAnticipo:   servicio.montoAnticipo,
+      nombreServicio:  servicio.nombre,
+      contenedor:      body,
+      onCitaCreada:    (cita) => {
+        cerrarModal(modalAgenda);
+        // El toast ya fue mostrado desde AgendaCalendario
+      },
+    });
+
+    abrirModal(modalAgenda);
+  }
+
+  function esc(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Iniciar ───────────────────────────────────────────────────
+  cargarNegocio();
+</script>
+
+</body>
+</html>

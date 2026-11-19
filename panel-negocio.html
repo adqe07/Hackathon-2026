@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Negocio | Hiperlocal</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/componentes.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <span class="logo__icon">📍</span>
+      Hiperlocal
+    </a>
+    <nav class="header-nav">
+      <div id="panel-usuario-info" style="font-size:var(--text-sm);text-align:right;"></div>
+      <button id="btn-logout" class="btn btn--ghost btn--sm">Salir</button>
+    </nav>
+  </div>
+</header>
+
+<!-- LAYOUT PANEL -->
+<div class="panel-layout" id="panel-layout">
+
+  <!-- SIDEBAR DESKTOP -->
+  <aside class="panel-sidebar" aria-label="Menú del panel">
+    <nav class="panel-nav" role="navigation">
+      <button class="panel-nav__item" data-seccion="dashboard">
+        <span class="icon">📊</span> Dashboard
+      </button>
+      <button class="panel-nav__item" data-seccion="productos">
+        <span class="icon">📦</span> Productos
+      </button>
+      <button class="panel-nav__item" data-seccion="servicios">
+        <span class="icon">💇</span> Servicios
+      </button>
+      <button class="panel-nav__item" data-seccion="citas">
+        <span class="icon">🗓</span> Citas
+      </button>
+      <button class="panel-nav__item" data-seccion="apartados">
+        <span class="icon">🛍️</span> Apartados
+      </button>
+    </nav>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="panel-main" id="panel-main" aria-live="polite">
+
+    <!-- Secciones (se muestran/ocultan por JS) -->
+    <section class="panel-seccion" id="sec-dashboard" style="display:none;">
+      <!-- Se llena por panel.js → cargarDashboard() -->
+    </section>
+
+    <section class="panel-seccion" id="sec-productos" style="display:none;">
+      <!-- Se llena por panel.js → cargarProductos() -->
+    </section>
+
+    <section class="panel-seccion" id="sec-servicios" style="display:none;">
+      <!-- Se llena por panel.js → cargarServicios() -->
+    </section>
+
+    <section class="panel-seccion" id="sec-citas" style="display:none;">
+      <!-- Se llena por panel.js → cargarCitas() -->
+    </section>
+
+    <section class="panel-seccion" id="sec-apartados" style="display:none;">
+      <!-- Se llena por panel.js → cargarApartados() -->
+    </section>
+
+  </main>
+</div>
+
+<!-- NAV INFERIOR MOBILE (Panel) -->
+<nav class="bottom-nav" aria-label="Navegación del panel">
+  <button class="bottom-nav__item panel-nav__item" data-seccion="dashboard">
+    <span class="icon">📊</span><span>Dashboard</span>
+  </button>
+  <button class="bottom-nav__item panel-nav__item" data-seccion="productos">
+    <span class="icon">📦</span><span>Productos</span>
+  </button>
+  <button class="bottom-nav__item panel-nav__item" data-seccion="citas">
+    <span class="icon">🗓</span><span>Citas</span>
+  </button>
+  <button class="bottom-nav__item panel-nav__item" data-seccion="servicios">
+    <span class="icon">💇</span><span>Servicios</span>
+  </button>
+  <button class="bottom-nav__item" id="btn-logout-mobile" style="color:var(--color-danger);">
+    <span class="icon">🚪</span><span>Salir</span>
+  </button>
+</nav>
+
+<script type="module">
+  import { initPanel } from './js/panel.js';
+  initPanel();
+</script>
+
+</body>
+</html>
