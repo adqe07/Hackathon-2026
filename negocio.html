@@ -72,8 +72,7 @@
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;">
           <h1 id="negocio-nombre" style="font-size:var(--text-2xl);margin:0;">Cargando…</h1>
-          <span id="negocio-verificado" style="display:none;" title="Negocio verificado" aria-label="Verificado">✓</span>
-          <span id="negocio-plan-badge"></span>
+          <span id="negocio-verificado" class="verified-badge verified-badge--large" hidden title="Negocio verificado" aria-label="Negocio verificado"></span>
         </div>
         <p id="negocio-categoria" class="text-sm text-muted" style="margin:var(--space-1) 0 var(--space-2);"></p>
         <div style="display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;font-size:var(--text-sm);color:var(--color-text-muted);">
@@ -89,6 +88,16 @@
   <div class="container" style="padding-top:var(--space-5);">
     <p id="negocio-descripcion" class="text-muted" style="max-width:680px;"></p>
   </div>
+
+  <section class="mapa-seccion" aria-labelledby="mapa-negocio-titulo">
+    <div class="container">
+      <div class="mapa-seccion__encabezado">
+        <div><h2 id="mapa-negocio-titulo">Ubicación del negocio</h2><p id="mapa-negocio-ayuda" class="text-sm text-muted">Compara tu posición con la ubicación registrada por el comerciante.</p></div>
+        <a id="mapa-como-llegar" class="btn btn--ghost btn--sm" target="_blank" rel="noopener noreferrer" hidden>Cómo llegar con Google Maps ↗</a>
+      </div>
+      <div id="mova-map-negocio" class="mapa-mova mapa-mova--detalle" aria-busy="true"></div>
+    </div>
+  </section>
 
   <!-- TABS: Productos / Servicios -->
   <div class="container" style="padding-top:var(--space-4);">
@@ -168,6 +177,7 @@
   import { api, ApiError, formatMXN, formatFecha, toast, btnLoading } from './js/api.js';
   import { AgendaCalendario, mostrarTicketRecoleccion } from './js/agenda.js';
   import { geo, Geolocalizacion } from './js/geolocalizacion.js';
+  import { MapaMova } from './js/mapa.js';
 
   // ── Leer negocio_id de la URL ─────────────────────────────────
   const params    = new URLSearchParams(window.location.search);
@@ -228,6 +238,7 @@
 
   // ── Cargar datos del negocio ──────────────────────────────────
   let negocioData = null;
+  const mapaNegocio = new MapaMova('#mova-map-negocio', { modo: 'detalle' });
 
   async function cargarNegocio() {
     try {
@@ -242,6 +253,8 @@
 
       negocioData = data.negocio;
       _renderPerfil(negocioData, coords);
+      mapaNegocio.render({ usuario: coords, negocios: [negocioData] });
+      document.getElementById('mova-map-negocio').setAttribute('aria-busy', 'false');
       await Promise.all([cargarProductos(), cargarServicios()]);
     } catch (err) {
       document.getElementById('negocio-nombre').textContent = 'Negocio no encontrado';
@@ -252,6 +265,11 @@
     document.title = `${n.nombre} | Mova`;
     document.getElementById('negocio-nombre').textContent    = n.nombre;
     document.getElementById('negocio-descripcion').textContent = n.descripcion ?? '';
+    if (Number.isFinite(Number(n.latitud)) && Number.isFinite(Number(n.longitud))) {
+      const comoLlegar = document.getElementById('mapa-como-llegar');
+      comoLlegar.href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${n.latitud},${n.longitud}`)}`;
+      comoLlegar.hidden = false;
+    }
 
     // Categoría
     const catEl = document.getElementById('negocio-categoria');
@@ -260,16 +278,8 @@
     // Verificado
     if (n.verificado) {
       const v = document.getElementById('negocio-verificado');
-      v.style.display = 'inline';
-      v.style.color = 'var(--color-primary)';
-      v.style.fontWeight = 'bold';
+      v.hidden = false;
     }
-
-    // Plan badge
-    document.getElementById('negocio-plan-badge').innerHTML =
-      n.plan_suscripcion === 'pro'
-        ? `<span class="badge badge--pro">Pro</span>`
-        : `<span class="badge badge--basico">Básico</span>`;
 
     // Distancia
     if (n.distancia_km != null) {
@@ -362,11 +372,11 @@
         <label class="form-label">Modalidad de pago</label>
         <select id="tipo-pago" class="form-control">
           <option value="efectivo_tienda">💵 Efectivo en tienda (válido 3 horas)</option>
-          ${negocioData?.plan_suscripcion === 'pro'
+          ${negocioData?.pago_online_habilitado
             ? `<option value="online">💳 Pago en línea (Click &amp; Collect)</option>`
             : ''}
         </select>
-        ${negocioData?.plan_suscripcion !== 'pro'
+        ${!negocioData?.pago_online_habilitado
           ? `<span class="form-hint">Este negocio solo acepta pago en efectivo.</span>`
           : ''}
       </div>
@@ -446,14 +456,16 @@
           <div class="servicio-card__footer">
             <div class="servicio-card__precios">
               <div class="servicio-card__precio-estimado">${formatMXN(s.precio_estimado)}</div>
-              <div class="servicio-card__anticipo">Anticipo: <strong>${formatMXN(s.monto_anticipo)}</strong></div>
+              <div class="servicio-card__anticipo">Garantía: <strong>${formatMXN(s.monto_anticipo)}</strong></div>
             </div>
             <button class="btn btn--primary btn-agendar"
               data-id="${s.id}"
               data-nombre="${esc(s.nombre)}"
               data-duracion="${s.duracion_minutos}"
               data-precio="${s.precio_estimado}"
-              data-anticipo="${s.monto_anticipo}">
+              data-anticipo="${s.monto_anticipo}"
+              data-permite-anticipo="${s.permite_anticipo}"
+              data-permite-total="${s.permite_pago_total}">
               🗓 Agendar
             </button>
           </div>
@@ -466,6 +478,8 @@
           duracionMinutos:  parseInt(btn.dataset.duracion),
           precioEstimado:   parseFloat(btn.dataset.precio),
           montoAnticipo:    parseFloat(btn.dataset.anticipo),
+          permiteAnticipo:  Number(btn.dataset.permiteAnticipo) === 1,
+          permitePagoTotal: Number(btn.dataset.permiteTotal) === 1,
         }));
       });
     } catch {
@@ -484,6 +498,8 @@
       duracionMinutos: servicio.duracionMinutos,
       precioEstimado:  servicio.precioEstimado,
       montoAnticipo:   servicio.montoAnticipo,
+      permiteAnticipo: servicio.permiteAnticipo,
+      permitePagoTotal: servicio.permitePagoTotal,
       nombreServicio:  servicio.nombre,
       contenedor:      body,
       onCitaCreada:    (cita) => {

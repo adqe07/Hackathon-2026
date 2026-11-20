@@ -8,6 +8,7 @@
 
 import { api, ApiError, formatMXN, toast } from './api.js';
 import { geo, Geolocalizacion } from './geolocalizacion.js';
+import { MapaMova } from './mapa.js';
 
 // ─── Estado global del buscador ───────────────────────────────────
 const estado = {
@@ -24,7 +25,8 @@ const estado = {
 
 // ─── Referencias DOM (se asignan en init) ─────────────────────────
 let elSearchInput, elSearchBtn, elChips, elGrid, elResultCount,
-    elBtnUbicacion, elBtnDemo, elSkeletons, elBtnVerMas;
+    elBtnUbicacion, elBtnDemo, elSkeletons, elBtnVerMas, elMapa, elMapaResumen;
+let mapaInicio = null;
 
 // ═══════════════════════════════════════════════════════════════════
 // INICIALIZACIÓN
@@ -38,6 +40,9 @@ export async function initBuscador() {
   elBtnUbicacion = document.getElementById('btn-ubicacion');
   elBtnDemo      = document.getElementById('btn-ubicacion-demo');
   elBtnVerMas    = document.getElementById('btn-ver-mas');
+  elMapa         = document.getElementById('mova-map-inicio');
+  elMapaResumen  = document.getElementById('mapa-inicio-resumen');
+  mapaInicio     = new MapaMova(elMapa);
 
   if (!elSearchInput || !elGrid) return; // No estamos en index.html
 
@@ -187,6 +192,9 @@ function renderResultados(append = false) {
       </div>`;
     if (elResultCount) elResultCount.textContent = '0 negocios';
     if (elBtnVerMas) elBtnVerMas.style.display = 'none';
+    mapaInicio?.render({ usuario: estado.lat != null && estado.lon != null ? { lat: estado.lat, lon: estado.lon } : null, negocios: [] });
+    elMapa?.setAttribute('aria-busy', 'false');
+    if (elMapaResumen) elMapaResumen.textContent = 'Sin negocios para representar';
     return;
   }
 
@@ -212,6 +220,13 @@ function renderResultados(append = false) {
       elBtnVerMas.textContent = `Ver más (${estado.total - estado.resultados.length} restantes)`;
     }
   }
+
+  mapaInicio?.render({
+    usuario: estado.lat != null && estado.lon != null ? { lat: estado.lat, lon: estado.lon } : null,
+    negocios: estado.resultados,
+  });
+  elMapa?.setAttribute('aria-busy', 'false');
+  if (elMapaResumen) elMapaResumen.textContent = `${estado.resultados.length} ${estado.resultados.length === 1 ? 'ubicación visible' : 'ubicaciones visibles'}`;
 }
 
 /**
@@ -230,12 +245,8 @@ function crearNegocioCard(negocio) {
     ? Geolocalizacion.formatDistancia(parseFloat(negocio.distancia_km))
     : '';
 
-  const planBadge = negocio.plan_suscripcion === 'pro'
-    ? `<span class="badge badge--pro">Pro</span>`
-    : `<span class="badge badge--basico">Básico</span>`;
-
   const verificadoIcon = negocio.verificado
-    ? `<span class="verificado-icon" title="Negocio verificado">✓</span>`
+    ? `<span class="verified-badge" title="Negocio verificado" aria-label="Negocio verificado"></span>`
     : '';
 
   const logoHTML = negocio.logo_url
@@ -247,7 +258,6 @@ function crearNegocioCard(negocio) {
       <div class="negocio-card__cover-placeholder">
         ${_categoriaEmoji(negocio.categoria)}
       </div>
-      <div class="negocio-card__plan-badge">${planBadge}</div>
     </div>
     <div class="negocio-card__body">
       <div class="negocio-card__header">

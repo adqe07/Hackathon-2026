@@ -549,10 +549,15 @@ function handleListarServicios(string $method): never
 
     $pdo  = getPDO();
     $stmt = $pdo->prepare('
-        SELECT id, negocio_id, nombre, descripcion, duracion_minutos, precio_estimado, monto_anticipo, activo
-        FROM servicios
-        WHERE negocio_id = ? AND activo = 1
-        ORDER BY id ASC
+        SELECT s.id, s.negocio_id, s.nombre, s.descripcion, s.duracion_minutos, s.precio_estimado, s.monto_anticipo, s.activo,
+               COALESCE(c.tipo_garantia, IF(s.monto_anticipo > 0, \'fijo\', \'ninguna\')) AS tipo_garantia,
+               COALESCE(c.valor_garantia, s.monto_anticipo) AS valor_garantia,
+               COALESCE(c.permite_anticipo, 1) AS permite_anticipo,
+               COALESCE(c.permite_pago_total, 1) AS permite_pago_total
+        FROM servicios s
+        LEFT JOIN servicios_config_pago c ON c.servicio_id = s.id
+        WHERE s.negocio_id = ? AND s.activo = 1
+        ORDER BY s.id ASC
     ');
     $stmt->execute([$negocioId]);
 
@@ -572,11 +577,15 @@ function handleCrearServicio(string $method): never
     $desc      = trim($body['descripcion'] ?? '');
     $duracion  = filter_var($body['duracion_minutos'] ?? null, FILTER_VALIDATE_INT);
     $precio    = filter_var($body['precio_estimado'] ?? null, FILTER_VALIDATE_FLOAT);
-    $anticipo  = filter_var($body['monto_anticipo'] ?? 0, FILTER_VALIDATE_FLOAT);
+    $tipoGarantia = trim($body['tipo_garantia'] ?? 'ninguna');
+    $valorGarantia = filter_var($body['valor_garantia'] ?? 0, FILTER_VALIDATE_FLOAT);
+    $permiteAnticipo = filter_var($body['permite_anticipo'] ?? true, FILTER_VALIDATE_BOOLEAN);
+    $permiteTotal = filter_var($body['permite_pago_total'] ?? true, FILTER_VALIDATE_BOOLEAN);
 
-    if (!$negocioId || $nombre === '' || !$duracion || $precio === false) {
+    if (!$negocioId || $nombre === '' || !$duracion || $precio === false || $precio < 0 || !in_array($tipoGarantia, ['ninguna','porcentaje','fijo'], true) || $valorGarantia === false || (!$permiteAnticipo && !$permiteTotal)) {
         jsonResponse(['success' => false, 'error' => 'Campos de servicio obligatorios o inválidos.'], 422);
     }
+    $anticipo = calcularGarantiaServicio($tipoGarantia, (float) $valorGarantia, (float) $precio);
 
     $stmtN = $pdo->prepare('SELECT id FROM negocios WHERE id = ? AND usuario_id = ? LIMIT 1');
     $stmtN->execute([$negocioId, $usuario['id']]);
@@ -584,8 +593,18 @@ function handleCrearServicio(string $method): never
         jsonResponse(['success' => false, 'error' => 'No autorizado.'], 403);
     }
 
-    $sql = 'INSERT INTO servicios (negocio_id, nombre, descripcion, duracion_minutos, precio_estimado, monto_anticipo) VALUES (?, ?, ?, ?, ?, ?)';
-    $pdo->prepare($sql)->execute([$negocioId, $nombre, $desc ?: null, $duracion, $precio, max(0, $anticipo)]);
+    $pdo->beginTransaction();
+    try {
+        $sql = 'INSERT INTO servicios (negocio_id, nombre, descripcion, duracion_minutos, precio_estimado, monto_anticipo) VALUES (?, ?, ?, ?, ?, ?)';
+        $pdo->prepare($sql)->execute([$negocioId, $nombre, $desc ?: null, $duracion, $precio, $anticipo]);
+        $servicioId = (int) $pdo->lastInsertId();
+        $pdo->prepare('INSERT INTO servicios_config_pago (servicio_id, tipo_garantia, valor_garantia, permite_anticipo, permite_pago_total) VALUES (?, ?, ?, ?, ?)')
+            ->execute([$servicioId, $tipoGarantia, $tipoGarantia === 'ninguna' ? 0 : $valorGarantia, (int) $permiteAnticipo, (int) $permiteTotal]);
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        jsonResponse(['success' => false, 'error' => 'No fue posible crear el servicio.'], 500);
+    }
 
     jsonResponse(['success' => true, 'mensaje' => 'Servicio creado exitosamente.'], 201);
 }
@@ -603,19 +622,34 @@ function handleEditarServicio(string $method): never
     $desc     = trim($body['descripcion'] ?? '');
     $duracion = filter_var($body['duracion_minutos'] ?? null, FILTER_VALIDATE_INT);
     $precio   = filter_var($body['precio_estimado'] ?? null, FILTER_VALIDATE_FLOAT);
-    $anticipo = filter_var($body['monto_anticipo'] ?? 0, FILTER_VALIDATE_FLOAT);
+    $tipoGarantia = trim($body['tipo_garantia'] ?? 'ninguna');
+    $valorGarantia = filter_var($body['valor_garantia'] ?? 0, FILTER_VALIDATE_FLOAT);
+    $permiteAnticipo = filter_var($body['permite_anticipo'] ?? true, FILTER_VALIDATE_BOOLEAN);
+    $permiteTotal = filter_var($body['permite_pago_total'] ?? true, FILTER_VALIDATE_BOOLEAN);
 
-    if (!$id || $nombre === '' || !$duracion || $precio === false) {
+    if (!$id || $nombre === '' || !$duracion || $precio === false || $precio < 0 || !in_array($tipoGarantia, ['ninguna','porcentaje','fijo'], true) || $valorGarantia === false || (!$permiteAnticipo && !$permiteTotal)) {
         jsonResponse(['success' => false, 'error' => 'Datos inválidos.'], 422);
     }
+    $anticipo = calcularGarantiaServicio($tipoGarantia, (float) $valorGarantia, (float) $precio);
 
-    $stmt = $pdo->prepare('
-        UPDATE servicios s
-        JOIN negocios n ON n.id = s.negocio_id
-        SET s.nombre = ?, s.descripcion = ?, s.duracion_minutos = ?, s.precio_estimado = ?, s.monto_anticipo = ?
-        WHERE s.id = ? AND n.usuario_id = ?
-    ');
-    $stmt->execute([$nombre, $desc ?: null, $duracion, $precio, max(0, $anticipo), $id, $usuario['id']]);
+    $pdo->beginTransaction();
+    try {
+        $stmt = $pdo->prepare('
+            UPDATE servicios s JOIN negocios n ON n.id = s.negocio_id
+            SET s.nombre = ?, s.descripcion = ?, s.duracion_minutos = ?, s.precio_estimado = ?, s.monto_anticipo = ?
+            WHERE s.id = ? AND n.usuario_id = ?
+        ');
+        $stmt->execute([$nombre, $desc ?: null, $duracion, $precio, $anticipo, $id, $usuario['id']]);
+        $check = $pdo->prepare('SELECT s.id FROM servicios s JOIN negocios n ON n.id=s.negocio_id WHERE s.id=? AND n.usuario_id=?');
+        $check->execute([$id, $usuario['id']]);
+        if (!$check->fetch()) throw new RuntimeException('No autorizado.');
+        $pdo->prepare('INSERT INTO servicios_config_pago (servicio_id, tipo_garantia, valor_garantia, permite_anticipo, permite_pago_total) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE tipo_garantia=VALUES(tipo_garantia), valor_garantia=VALUES(valor_garantia), permite_anticipo=VALUES(permite_anticipo), permite_pago_total=VALUES(permite_pago_total)')
+            ->execute([$id, $tipoGarantia, $tipoGarantia === 'ninguna' ? 0 : $valorGarantia, (int) $permiteAnticipo, (int) $permiteTotal]);
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        jsonResponse(['success' => false, 'error' => $e->getMessage()], 400);
+    }
 
     jsonResponse(['success' => true, 'mensaje' => 'Servicio actualizado.']);
 }
@@ -640,4 +674,16 @@ function handleEliminarServicio(string $method): never
     $stmt->execute([$id, $usuario['id']]);
 
     jsonResponse(['success' => true, 'mensaje' => 'Servicio eliminado.']);
+}
+
+function calcularGarantiaServicio(string $tipo, float $valor, float $precio): float
+{
+    if ($tipo === 'ninguna') return 0.0;
+    if ($valor < 0) jsonResponse(['success' => false, 'error' => 'La garantía no puede ser negativa.'], 422);
+    if ($tipo === 'porcentaje') {
+        if ($valor <= 0 || $valor > 100) jsonResponse(['success' => false, 'error' => 'El porcentaje debe estar entre 1 y 100.'], 422);
+        return round($precio * $valor / 100, 2);
+    }
+    if ($valor > $precio) jsonResponse(['success' => false, 'error' => 'La garantía fija no puede superar el precio.'], 422);
+    return round($valor, 2);
 }

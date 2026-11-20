@@ -136,7 +136,6 @@ function handleBuscar(): never
             n.latitud,
             n.longitud,
             n.logo_url,
-            n.plan_suscripcion,
             n.verificado,
             $selectDistancia
         FROM negocios n
@@ -178,7 +177,6 @@ function handleBuscar(): never
             'latitud'           => $row['latitud'] !== null ? (float) $row['latitud'] : null,
             'longitud'          => $row['longitud'] !== null ? (float) $row['longitud'] : null,
             'logo_url'          => $row['logo_url'],
-            'plan_suscripcion'  => $row['plan_suscripcion'],
             'verificado'        => (bool) $row['verificado'],
             'distancia_km'      => $row['distancia_km'] !== null ? round((float) $row['distancia_km'], 2) : null,
         ];

@@ -56,6 +56,8 @@
   --color-info:           #3B82F6;   /* Información general y notificaciones */
   --color-info-bg:        #DBEAFE;
   --color-danger-dark:    #DC2626;
+  --color-verified:       #3897F0;   /* Insignia pública de negocio verificado */
+  --color-verified-check: #FFFFFF;
 
   /* Contrastes semánticos editables por el diseñador */
   --color-on-action:       #FFFFFF;
@@ -94,13 +96,6 @@
   --badge-cancelada-bg:     #FEE2E2;
   --badge-cancelada-text:   #991B1B;
   --badge-no-show-text:     #7F1D1D;
-  --badge-plan-pro-text:    #78350F;
-  --badge-plan-basico-text: #6B7280;
-
-  /* Distintivos de Planes */
-  --color-plan-basico:      #6B7280;
-  --color-plan-pro:         #F59E0B;
-
   /* ===========================================================================
      5. TIPOGRAFÍA
      (Para cambiar de fuente, importa tu Google Font y colócala aquí)
@@ -172,6 +167,29 @@
   --max-width-xl:   1280px;
   --header-height:  60px;
   --bottom-nav-h:   64px;
+
+  /* Componentes de pago simulado (ajustes locales para el diseñador) */
+  --payment-card-min-height: 11rem;
+  --payment-card-chip-width: 2.5rem;
+  --payment-card-chip-height: 1.75rem;
+  --payment-card-number-tracking: 0.08em;
+  --payment-panel-min-width: 20rem;
+
+  /* Mapa propio de Mova */
+  --map-min-height: 20rem;
+  --map-detail-min-height: 17rem;
+  --map-grid-size: 5rem;
+  --map-user-marker: var(--color-info);
+  --map-business-marker: var(--color-primary);
+  --map-nearest-marker: var(--color-success);
+  --map-connection: var(--color-primary);
+  --map-list-min-width: 15rem;
+  --map-tile-size: 256px;
+  --map-marker-size: 2.5rem;
+  --map-user-size: 1.5rem;
+  --map-control-size: 2.75rem;
+  --map-marker-border: 3px;
+  --map-focus-width: 3px;
 }
 
 /* =============================================================================

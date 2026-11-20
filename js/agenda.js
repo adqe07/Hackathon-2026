@@ -3,7 +3,7 @@
  * -------------------------------------------------
  * Calendario de selección de fecha/hora,
  * cálculo de slots disponibles, flujo de anticipo
- * y generación/validación del PIN de 4 dígitos.
+ * y confirmación mutua mediante códigos temporales.
  * -------------------------------------------------
  */
 
@@ -30,6 +30,8 @@ export class AgendaCalendario {
     this.duracion        = opts.duracionMinutos;
     this.precioEstimado  = opts.precioEstimado;
     this.montoAnticipo   = opts.montoAnticipo;
+    this.permiteAnticipo = opts.permiteAnticipo ?? true;
+    this.permitePagoTotal = opts.permitePagoTotal ?? true;
     this.nombreServicio  = opts.nombreServicio;
     this.contenedor      = opts.contenedor;
     this.onCitaCreada    = opts.onCitaCreada ?? (() => {});
@@ -70,24 +72,26 @@ export class AgendaCalendario {
             <div style="font-size:var(--text-sm);color:var(--color-text-muted);">⏱ Duración: <strong>${this.duracion} min</strong></div>
             <hr style="border:none;border-top:1px solid var(--color-border);">
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <span class="text-sm">Precio estimado:</span>
+              <span class="text-sm">Precio fijo:</span>
               <span style="font-weight:var(--weight-semibold);" id="res-precio"></span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;
                         background:var(--color-warning-bg);padding:var(--space-3);
                         border-radius:var(--radius-md);">
-              <span class="text-sm font-semibold">Anticipo a pagar ahora:</span>
+              <span class="text-sm font-semibold">Garantía máxima por ausencia:</span>
               <span style="font-weight:var(--weight-bold);color:var(--color-secondary);font-size:var(--text-xl);" id="res-anticipo"></span>
             </div>
-            <p class="text-xs text-muted">
-              💡 El anticipo queda en custodia. Se devuelve si cancelas antes del límite configurado por el negocio.
-            </p>
+            <fieldset class="payment-choice-group"><legend>Elige cómo pagar</legend>
+              ${this.permiteAnticipo ? `<label class="payment-choice"><input type="radio" name="modalidad_pago" value="${this.montoAnticipo > 0 ? 'anticipo' : 'sin_anticipo'}" checked> ${this.montoAnticipo > 0 ? `Pagar garantía de ${formatMXN(this.montoAnticipo)}` : 'Reservar sin anticipo'}</label>` : ''}
+              ${this.permitePagoTotal ? `<label class="payment-choice"><input type="radio" name="modalidad_pago" value="total" ${!this.permiteAnticipo ? 'checked' : ''}> Pagar total de ${formatMXN(this.precioEstimado)}</label>` : ''}
+            </fieldset>
+            <p class="text-xs text-muted">Cancelación gratuita hasta la hora exacta de la cita. Después, la penalización nunca supera la garantía.</p>
           </div>
 
           <div id="agenda-error" class="alert alert--danger" style="display:none;"></div>
 
           <button id="btn-agendar" class="btn btn--primary btn--full btn--lg">
-            Pagar anticipo y agendar
+            Confirmar pago y agendar
           </button>
         </div>
       </div>`;
@@ -233,9 +237,10 @@ export class AgendaCalendario {
         servicio_id:       this.servicioId,
         negocio_id:        this.negocioId,
         fecha_hora_inicio: `${this._fechaSeleccionada} ${this._slotSeleccionado}:00`,
+        modalidad_pago: this.contenedor.querySelector('input[name="modalidad_pago"]:checked')?.value,
       });
 
-      toast('¡Cita agendada! Revisa tu correo y el PIN en Mis Citas.', 'success', 5000);
+      toast('¡Cita agendada! Consulta el seguimiento y los códigos temporales en Mis Citas.', 'success', 5000);
       this.onCitaCreada(data.cita);
     } catch (err) {
       const msg = err instanceof ApiError ? err.message : 'Error al agendar. Intenta de nuevo.';
@@ -259,28 +264,8 @@ export async function confirmarCita(citaId) {
 }
 
 /**
- * Inicia una cita validando el PIN del cliente (negocio → en_curso).
- * @param {number} citaId
- * @param {string} pin   — 4 dígitos introducidos por el negocio
- */
-export async function iniciarCitaConPin(citaId, pin) {
-  if (!/^\d{4}$/.test(pin)) {
-    throw new Error('El PIN debe ser exactamente 4 dígitos numéricos.');
-  }
-  return _cambiarEstado(citaId, 'iniciar', { pin });
-}
-
-/**
- * Completa una cita (negocio → completada, libera anticipo).
- * @param {number} citaId
- */
-export async function completarCita(citaId) {
-  return _cambiarEstado(citaId, 'completar');
-}
-
-/**
  * Cancela una cita (cliente o negocio).
- * El servidor determina si aplica penalización según la ventana configurada.
+ * El servidor aplica la hora exacta como límite de cancelación gratuita.
  * @param {number} citaId
  */
 export async function cancelarCita(citaId) {
