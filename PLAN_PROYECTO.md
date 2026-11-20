@@ -27,18 +27,15 @@ El desarrollo debe realizarse **100% en tecnologías nativas/puras** para maximi
   2. *Apartado en efectivo:* Bloquea `1` unidad del stock por un tiempo límite (`TTL = 3 horas`). Si expira sin marcarse como pagado en tienda, el sistema libera el stock automáticamente al consultar disponibilidad.
 
 ### B. Módulo de Servicios y Agenda Blindada
-* Cada servicio tiene: nombre, descripción, duración, precio fijo y una garantía opcional definida como monto fijo, porcentaje o sin garantía.
-* El comerciante decide si permite reservar pagando sólo la garantía, pagar el total o ambas alternativas.
+* Cada servicio tiene: nombre, descripción, duración en minutos, precio estimado y monto/porcentaje de anticipo requerido.
 * **Máquina de Estados de la Cita:**
-  * `AGENDADA` (Garantía o pago retenido en custodia `ESCROW`).
+  * `PENDIENTE_PAGO` (Bloquea horario por 10 min mientras se paga el anticipo).
+  * `AGENDADA` (Anticipo retenido en custodia `ESCROW`).
   * `CONFIRMADA` (Aceptada por el negocio).
-  * `EN_CURSO` (Confirmación mutua: cada parte genera un código temporal de seis dígitos y valida el de la contraparte).
-  * `RETENCION_24H` (Servicio finalizado y pago retenido durante 24 horas para permitir disputas).
-  * `COMPLETADA` (Fondos liberados al negocio después de la retención si no existe disputa).
-  * `CANCELADA_A_TIEMPO` (Antes de la hora exacta programada → reembolso completo).
-  * `NO_SHOW` (Después de 15 minutos de tolerancia, más una prórroga aceptada si existe). El negocio puede perdonar o retener 25%, 50%, 75% o 100% de la garantía; nunca más que la garantía.
-* Cualquiera de las partes puede solicitar una prórroga de 10, 15 o 30 minutos y la otra debe aceptarla.
-* Las disputas retienen los fondos, admiten evidencias durante 48 horas y tienen una meta de resolución de siete días hábiles.
+  * `EN_CURSO` (Validada en el local mediante **PIN de 4 dígitos** del cliente).
+  * `COMPLETADA` (Anticipo liberado al saldo del negocio).
+  * `CANCELADA_A_TIEMPO` (Antes de $T_{limite}$ configurado por el negocio → 100% reembolsado al monedero interno del cliente).
+  * `CANCELADA_TARDE` / `NO_SHOW` (Después de $T_{limite}$ o tras 15 min de tolerancia sin PIN → 100% del anticipo se transfiere al negocio como compensación).
 
 ### C. Buscador por Cercanía
 * Búsqueda unificada por texto (`LIKE` / `FULLTEXT`) sobre nombre de negocio, categoría, título de producto o servicio.
@@ -65,10 +62,8 @@ El desarrollo debe realizarse **100% en tecnologías nativas/puras** para maximi
 ├── js/
 │   ├── api.js                  # Wrapper limpio de fetch() para comunicarse con /api/*.php
 │   ├── geolocalizacion.js      # Captura de GPS del navegador y fallback manual
-│   ├── mapa.js                 # Mapa SVG propio con proyección de coordenadas y distancias
 │   ├── buscador.js             # Lógica de filtros y renderizado dinámico en index.html
-│   ├── agenda.js               # Calendario, horarios, garantías y ticket de recolección
-│   ├── cliente.js              # Portal personal, tarjetas simuladas y seguimiento de citas
+│   ├── agenda.js               # Calendario, slots disponibles, cálculo de anticipo y PIN
 │   └── panel.js                # CRUD de productos/servicios, upload de fotos y gestión de citas
 ├── api/
 │   ├── config/
@@ -80,8 +75,7 @@ El desarrollo debe realizarse **100% en tecnologías nativas/puras** para maximi
 │   ├── citas.php               # Creación de cita, validación de traslapes, estados y PIN
 │   └── pagos_simulador.php     # Simulador de webhook para acreditar anticipos y compras online
 ├── sql/
-│   ├── schema.sql              # Esquema base original
-│   └── etapa6_confianza_pagos.sql # Extensión aditiva de garantías, pagos y disputas
+│   └── schema.sql              # Script completo de creación de tablas e índices
 └── uploads/
     └── productos/              # Imágenes subidas por los negocios
 ```
@@ -95,15 +89,10 @@ El desarrollo debe realizarse **100% en tecnologías nativas/puras** para maximi
 - **Etapa 3 — Agenda Blindada y Panel del Negocio:** Completada, incluyendo límite mensual del Plan Básico y procesamiento automático de `no_show`.
 - **Etapa 4 — Portal del Cliente, Fotos y Pulido Visual:** Completada el 19 de noviembre de 2026.
 - **Etapa 5 — Estabilización del Dashboard del Comerciante:** Completada el 19 de noviembre de 2026.
-- **Etapa 6 — Confianza, Garantías y Pagos Simulados:** Versión piloto funcional implementada el 19 de noviembre de 2026.
 
 El cierre de la Etapa 4 incluye portal del cliente, carga física segura de imágenes, tickets Click & Collect, ubicación de demostración, transacciones para inventario y monederos, y centralización de colores y estados en `css/variables.css`. El folio de recolección se deriva de forma estable del ID del apartado sin modificar el esquema existente.
 
-La Etapa 5 habilita el alta inicial del perfil de negocio y verifica el funcionamiento integral de Dashboard, Productos, Servicios, Citas y Apartados tanto para Plan Básico como Pro.
-
-La Etapa 6 incorpora tarjetas simuladas tokenizadas (sin guardar número completo ni CVV), garantías configurables, pago de garantía o total, códigos temporales bilaterales, tolerancia y prórrogas, resolución flexible de ausencias, confirmación final, retención de 24 horas y disputas con resolución administrativa. El Plan Básico aplica una comisión piloto del 1% en servicios; el Plan Pro permanece con 0% durante la fase inicial.
-
-La experiencia de descubrimiento incluye un motor cartográfico propio de Mova en JavaScript Vanilla, con proyección Web Mercator y mosaicos de OpenStreetMap debidamente atribuidos. La portada representa los resultados visibles, permite zoom y desplazamiento y resalta el negocio más cercano; cada perfil compara la ubicación del cliente con las coordenadas registradas del establecimiento.
+La Etapa 5 habilita el alta inicial del perfil de negocio y verifica el funcionamiento integral de Dashboard, Productos, Servicios, Citas y Apartados tanto para Plan Básico como Pro. La siguiente etapa debe definirse antes de iniciar nuevas funcionalidades.
 
 ## 6. Datos de demostración ampliados
 

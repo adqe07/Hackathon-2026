@@ -15,11 +15,11 @@
   /* ===========================================================================
      1. CONTROL MAESTRO DE MARCA (Cambia estos valores para rebrandear la app)
      =========================================================================== */
-  --color-primary:        #6C63FF;   /* Color dominante: botones principales, links, iconos */
-  --color-primary-dark:   #574FCC;   /* Hover de botones y estados presionados */
-  --color-primary-light:  #EAE9FF;   /* Fondos suaves, badges y estados activos de menú */
+  --color-primary:        #A62526;   /* Color dominante: botones principales, links, iconos */
+  --color-primary-dark:   #851d1e;   /* Hover de botones y estados presionados */
+  --color-primary-light:  #F5E8E8;   /* Fondos suaves, badges y estados activos de menú */
   
-  --color-secondary:      #FF6584;   /* Color de acento: precios especiales, llamadas de atención */
+  --color-secondary:      #D98687;   /* Color de acento: precios especiales, llamadas de atención */
   --color-secondary-dark: #E04E6A;   /* Hover de elementos secundarios */
 
   /* Gradiente decorativo del banner principal / Hero */
@@ -34,14 +34,18 @@
   /* ===========================================================================
      2. ESCALA DE SUPERFICIES Y FONDOS
      =========================================================================== */
-  --color-bg:             #F7F8FC;   /* Fondo general de la aplicación */
-  --color-surface:        #FFFFFF;   /* Fondo de tarjetas, headers y modales */
+  --color-mova-fondo:     #F9F9F9;
+  --color-mova-superficie: #FFFFFF;
+  --color-mova-texto:     #762427;
+  --color-mova-texto-suave: #645555;
+  --color-bg:             var(--color-mova-fondo);
+  --color-surface:        var(--color-mova-superficie);
   --color-surface-alt:    #F0F1F7;   /* Fondos secundarios, placeholders e inputs neutros */
   --color-border:         #E2E5F0;   /* Líneas divisorias y bordes sutiles */
   
   /* Textos y contrastes */
-  --color-text:           #1A1D2E;   /* Texto principal (alta legibilidad) */
-  --color-text-muted:     #6B7280;   /* Subtítulos, fechas, categorías */
+  --color-text:           var(--color-mova-texto);
+  --color-text-muted:     var(--color-mova-texto-suave);
   --color-text-light:     #9CA3AF;   /* Placeholders e iconos secundarios */
 
   /* ===========================================================================
@@ -56,8 +60,6 @@
   --color-info:           #3B82F6;   /* Información general y notificaciones */
   --color-info-bg:        #DBEAFE;
   --color-danger-dark:    #DC2626;
-  --color-verified:       #3897F0;   /* Insignia pública de negocio verificado */
-  --color-verified-check: #FFFFFF;
 
   /* Contrastes semánticos editables por el diseñador */
   --color-on-action:       #FFFFFF;
@@ -96,6 +98,13 @@
   --badge-cancelada-bg:     #FEE2E2;
   --badge-cancelada-text:   #991B1B;
   --badge-no-show-text:     #7F1D1D;
+  --badge-plan-pro-text:    #78350F;
+  --badge-plan-basico-text: #6B7280;
+
+  /* Distintivos de Planes */
+  --color-plan-basico:      #6B7280;
+  --color-plan-pro:         #F59E0B;
+
   /* ===========================================================================
      5. TIPOGRAFÍA
      (Para cambiar de fuente, importa tu Google Font y colócala aquí)
@@ -167,29 +176,6 @@
   --max-width-xl:   1280px;
   --header-height:  60px;
   --bottom-nav-h:   64px;
-
-  /* Componentes de pago simulado (ajustes locales para el diseñador) */
-  --payment-card-min-height: 11rem;
-  --payment-card-chip-width: 2.5rem;
-  --payment-card-chip-height: 1.75rem;
-  --payment-card-number-tracking: 0.08em;
-  --payment-panel-min-width: 20rem;
-
-  /* Mapa propio de Mova */
-  --map-min-height: 20rem;
-  --map-detail-min-height: 17rem;
-  --map-grid-size: 5rem;
-  --map-user-marker: var(--color-info);
-  --map-business-marker: var(--color-primary);
-  --map-nearest-marker: var(--color-success);
-  --map-connection: var(--color-primary);
-  --map-list-min-width: 15rem;
-  --map-tile-size: 256px;
-  --map-marker-size: 2.5rem;
-  --map-user-size: 1.5rem;
-  --map-control-size: 2.75rem;
-  --map-marker-border: 3px;
-  --map-focus-width: 3px;
 }
 
 /* =============================================================================
@@ -236,7 +222,7 @@
    SOPORTE DE MODO OSCURO (Respeta preferencia del sistema del usuario)
    ============================================================================= */
 @media (prefers-color-scheme: dark) {
-  :root {
+  body:not(.inicio) {
     --color-bg:          #0F1117;
     --color-surface:     #1A1D2E;
     --color-surface-alt: #242740;

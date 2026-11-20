@@ -8,7 +8,6 @@
 
 import { api, ApiError, formatMXN, toast } from './api.js';
 import { geo, Geolocalizacion } from './geolocalizacion.js';
-import { MapaMova } from './mapa.js';
 
 // ─── Estado global del buscador ───────────────────────────────────
 const estado = {
@@ -19,14 +18,14 @@ const estado = {
   pagina:     1,
   porPagina:  12,
   cargando:   false,
+  solicitud:  0,
   resultados: [],
   total:      0,
 };
 
 // ─── Referencias DOM (se asignan en init) ─────────────────────────
 let elSearchInput, elSearchBtn, elChips, elGrid, elResultCount,
-    elBtnUbicacion, elBtnDemo, elSkeletons, elBtnVerMas, elMapa, elMapaResumen;
-let mapaInicio = null;
+    elBtnUbicacion, elBtnDemo, elUbicacion, elBtnVerMas;
 
 // ═══════════════════════════════════════════════════════════════════
 // INICIALIZACIÓN
@@ -39,10 +38,8 @@ export async function initBuscador() {
   elResultCount  = document.getElementById('result-count');
   elBtnUbicacion = document.getElementById('btn-ubicacion');
   elBtnDemo      = document.getElementById('btn-ubicacion-demo');
+  elUbicacion    = document.getElementById('location-value');
   elBtnVerMas    = document.getElementById('btn-ver-mas');
-  elMapa         = document.getElementById('mova-map-inicio');
-  elMapaResumen  = document.getElementById('mapa-inicio-resumen');
-  mapaInicio     = new MapaMova(elMapa);
 
   if (!elSearchInput || !elGrid) return; // No estamos en index.html
 
@@ -51,7 +48,7 @@ export async function initBuscador() {
   // Obtener ubicación e iniciar búsqueda
   mostrarSkeletons(true);
   try {
-    const coords = await geo.obtenerPosicion();
+    const coords = await geo.obtenerPosicion({ solicitarPermiso: false });
     estado.lat = coords.lat;
     estado.lon = coords.lon;
     _actualizarBtnUbicacion(coords.source);
@@ -94,8 +91,11 @@ function _bindEventos() {
     estado.categoria = (estado.categoria === val) ? '' : val;
     estado.pagina    = 1;
 
-    elChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    if (estado.categoria) chip.classList.add('active');
+    elChips.querySelectorAll('.chip').forEach(c => {
+      const activo = c.dataset.categoria === estado.categoria;
+      c.classList.toggle('active', activo);
+      c.setAttribute('aria-pressed', String(activo));
+    });
 
     buscar();
   });
@@ -103,7 +103,8 @@ function _bindEventos() {
   // Actualizar ubicación
   elBtnUbicacion?.addEventListener('click', async () => {
     elBtnUbicacion.disabled = true;
-    elBtnUbicacion.innerHTML = `<span class="spinner"></span>`;
+    elBtnDemo.disabled = true;
+    elUbicacion.textContent = 'Buscando ubicación…';
     try {
       const coords = await geo.actualizar();
       estado.lat = coords.lat;
@@ -112,9 +113,11 @@ function _bindEventos() {
       _actualizarBtnUbicacion(coords.source);
       await buscar();
     } catch {
+      _actualizarBtnUbicacion(geo.posicionActual?.source ?? 'default');
       toast('No se pudo actualizar la ubicación.', 'danger');
     } finally {
       elBtnUbicacion.disabled = false;
+      elBtnDemo.disabled = false;
     }
   });
 
@@ -130,7 +133,7 @@ function _bindEventos() {
 
   // Ver más (paginación)
   elBtnVerMas?.addEventListener('click', () => {
-    estado.pagina++;
+    if (estado.cargando) return;
     buscar(true); // append
   });
 }
@@ -140,8 +143,10 @@ function _bindEventos() {
  * @param {boolean} append - Si true, agrega resultados al grid existente
  */
 export async function buscar(append = false) {
-  if (estado.cargando) return;
+  const solicitud = ++estado.solicitud;
+  const pagina = append ? estado.pagina + 1 : 1;
   estado.cargando = true;
+  if (elBtnVerMas) elBtnVerMas.disabled = true;
   mostrarSkeletons(!append);
 
   try {
@@ -151,50 +156,58 @@ export async function buscar(append = false) {
       categoria: estado.categoria  || undefined,
       lat:       estado.lat        ?? undefined,
       lon:       estado.lon        ?? undefined,
-      pagina:    estado.pagina,
+      orden: 'distancia',
+      pagina,
       limite:    estado.porPagina,
     };
 
     const data = await api.get('buscar.php', params);
+    if (solicitud !== estado.solicitud) return;
+    estado.pagina = pagina;
     estado.resultados = append
       ? [...estado.resultados, ...(data.resultados ?? [])]
       : (data.resultados ?? []);
     estado.total = data.total ?? 0;
 
-    renderResultados(append);
+    renderResultados();
   } catch (err) {
+    if (solicitud !== estado.solicitud) return;
+    if (append) {
+      toast('No se pudieron cargar más negocios.', 'danger');
+      return;
+    }
+    if (elBtnVerMas) elBtnVerMas.style.display = 'none';
     if (err instanceof ApiError) {
       mostrarError(err.message);
     } else {
       mostrarError('Error inesperado. Intenta de nuevo.');
     }
   } finally {
-    estado.cargando = false;
-    mostrarSkeletons(false);
+    if (solicitud === estado.solicitud) {
+      estado.cargando = false;
+      if (elBtnVerMas) elBtnVerMas.disabled = false;
+    }
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════
 // RENDERIZADO
 // ═══════════════════════════════════════════════════════════════════
-function renderResultados(append = false) {
-  if (!append) elGrid.innerHTML = '';
-
+function renderResultados() {
+  document.getElementById('titulo-resultados').textContent =
+    estado.termino || estado.categoria ? 'Resultados' : 'Cerca de ti';
   if (!estado.resultados.length) {
     elGrid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1;">
         <div class="empty-state__icon">🔍</div>
         <div class="empty-state__title">Sin resultados</div>
         <p class="empty-state__desc">
-          No encontramos negocios con "${estado.termino || 'esa búsqueda'}".
-          Intenta con otra categoría o amplía tu radio de búsqueda.
+          No encontramos negocios con ${estado.termino ? `"${_escape(estado.termino)}"` : 'esos filtros'}.
+          Prueba con otra categoría o palabra.
         </p>
       </div>`;
     if (elResultCount) elResultCount.textContent = '0 negocios';
     if (elBtnVerMas) elBtnVerMas.style.display = 'none';
-    mapaInicio?.render({ usuario: estado.lat != null && estado.lon != null ? { lat: estado.lat, lon: estado.lon } : null, negocios: [] });
-    elMapa?.setAttribute('aria-busy', 'false');
-    if (elMapaResumen) elMapaResumen.textContent = 'Sin negocios para representar';
     return;
   }
 
@@ -204,8 +217,7 @@ function renderResultados(append = false) {
     fragment.appendChild(card);
   });
 
-  if (!append) elGrid.appendChild(fragment);
-  else elGrid.appendChild(fragment);
+  elGrid.replaceChildren(fragment);
 
   // Contador de resultados
   if (elResultCount) {
@@ -220,13 +232,6 @@ function renderResultados(append = false) {
       elBtnVerMas.textContent = `Ver más (${estado.total - estado.resultados.length} restantes)`;
     }
   }
-
-  mapaInicio?.render({
-    usuario: estado.lat != null && estado.lon != null ? { lat: estado.lat, lon: estado.lon } : null,
-    negocios: estado.resultados,
-  });
-  elMapa?.setAttribute('aria-busy', 'false');
-  if (elMapaResumen) elMapaResumen.textContent = `${estado.resultados.length} ${estado.resultados.length === 1 ? 'ubicación visible' : 'ubicaciones visibles'}`;
 }
 
 /**
@@ -238,60 +243,68 @@ function crearNegocioCard(negocio) {
   const card = document.createElement('article');
   card.className = 'negocio-card';
   card.setAttribute('role', 'button');
-  card.setAttribute('tabindex', '0');
+  card.tabIndex = 0;
   card.setAttribute('aria-label', `Ver negocio ${negocio.nombre}`);
-
-  const distTexto = negocio.distancia_km != null
-    ? Geolocalizacion.formatDistancia(parseFloat(negocio.distancia_km))
-    : '';
-
-  const verificadoIcon = negocio.verificado
-    ? `<span class="verified-badge" title="Negocio verificado" aria-label="Negocio verificado"></span>`
-    : '';
-
-  const logoHTML = negocio.logo_url
+  const distancia = negocio.distancia_km != null
+    ? Geolocalizacion.formatDistancia(Number(negocio.distancia_km)) : '';
+  const portadas = {
+    comercio: 'papeleria',
+    bazar: 'bazar',
+    joyeria: 'joyeria',
+    estetica: 'estetica',
+    belleza: 'estetica',
+    boutique: 'boutique',
+    ropa: 'boutique',
+    barberia: 'barberia',
+    perfumeria: 'perfumeria',
+    taller: 'taller',
+    tecnico: 'tecnologia',
+    salud: 'farmacia',
+    otro: 'farmacia',
+  };
+  const portadaProvisional = `imagenes/negocios/${portadas[negocio.categoria?.toLowerCase()] ?? 'papeleria'}.jpg`;
+  const verificado = negocio.verificado
+    ? '<span class="verificado-icon" title="Negocio verificado">✓</span>' : '';
+  const logo = negocio.logo_url
     ? `<img src="${_escape(negocio.logo_url)}" alt="Logo ${_escape(negocio.nombre)}" class="negocio-card__logo" loading="lazy">`
     : `<div class="negocio-card__logo" style="display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:var(--color-primary-light);">${_categoriaEmoji(negocio.categoria)}</div>`;
-
   card.innerHTML = `
     <div class="negocio-card__cover">
-      <div class="negocio-card__cover-placeholder">
-        ${_categoriaEmoji(negocio.categoria)}
-      </div>
+      <img class="negocio-card__foto" alt="" loading="lazy">
     </div>
     <div class="negocio-card__body">
       <div class="negocio-card__header">
-        ${logoHTML}
+        ${logo}
         <div class="negocio-card__info">
-          <div class="negocio-card__nombre">
-            ${_escape(negocio.nombre)} ${verificadoIcon}
-          </div>
+          <div class="negocio-card__nombre">${_escape(negocio.nombre)} ${verificado}</div>
           <div class="negocio-card__categoria">${_escape(_formatearCategoria(negocio.categoria))}</div>
         </div>
       </div>
       ${negocio.descripcion ? `<p class="negocio-card__desc">${_escape(negocio.descripcion)}</p>` : ''}
       <div class="negocio-card__meta">
-        ${distTexto ? `<span class="negocio-card__meta-item">📍 <span class="negocio-card__distancia">${distTexto}</span></span>` : ''}
+        ${distancia ? `<span class="negocio-card__meta-item">📍 <span class="negocio-card__distancia">${distancia}</span></span>` : ''}
         ${negocio.ciudad ? `<span class="negocio-card__meta-item">🏙 ${_escape(negocio.ciudad)}</span>` : ''}
       </div>
-      <div class="negocio-card__footer">
-        <span class="text-sm text-muted">Ver catálogo →</span>
-      </div>
+      <div class="negocio-card__footer"><span class="text-sm text-muted">Ver catálogo →</span></div>
     </div>`;
-
-  // Navegar al perfil del negocio
-  const navegar = () => {
-    window.location.href = `/hackathon/negocio.html?id=${negocio.id}`;
-  };
-  card.addEventListener('click', navegar);
-  card.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') navegar();
+  const foto = card.querySelector('.negocio-card__foto');
+  const imagenes = [...new Set([negocio.logo_url, negocio.imagen_producto_url, portadaProvisional].filter(Boolean))];
+  foto.addEventListener('error', () => {
+    const siguiente = imagenes.shift();
+    if (siguiente) foto.src = siguiente;
+    else foto.remove();
   });
-
+  foto.src = imagenes.shift();
+  const navegar = () => { window.location.href = `negocio.html?id=${encodeURIComponent(negocio.id)}`; };
+  card.addEventListener('click', navegar);
+  card.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      navegar();
+    }
+  });
   return card;
 }
-
-// ─── Skeletons de carga ───────────────────────────────────────────
 function mostrarSkeletons(mostrar) {
   if (!elGrid) return;
 
@@ -319,9 +332,13 @@ function mostrarError(msg) {
 
 // ─── Helpers privados ─────────────────────────────────────────────
 function _actualizarBtnUbicacion(source) {
-  if (!elBtnUbicacion) return;
-  const iconos = { gps: '📍', manual: '🔍', default: '🌆', demo: '🧪' };
-  elBtnUbicacion.innerHTML = `${iconos[source] ?? '📍'} Actualizar ubicación`;
+  const etiquetas = {
+    gps: 'Ubicación actual',
+    manual: 'Ubicación manual',
+    default: 'Centro de CDMX',
+    demo: 'Roma Norte, CDMX',
+  };
+  if (elUbicacion) elUbicacion.textContent = etiquetas[source] ?? 'Elegir ubicación';
 }
 
 function _escape(str) {
@@ -362,6 +379,15 @@ function _formatearCategoria(categoria) {
     ropa: 'Ropa',
     joyeria: 'Joyería',
     comercio: 'Comercio local',
+    restaurante: 'Restaurante',
+    salud: 'Salud',
+    automotriz: 'Servicio automotriz',
+    mascotas: 'Mascotas',
+    hogar: 'Servicios para el hogar',
+    cafeteria: 'Cafetería',
+    belleza: 'Belleza',
+    entretenimiento: 'Entretenimiento',
+    limpieza: 'Servicio de limpieza',
     otro: 'Otro comercio',
   };
   return etiquetas[categoria?.toLowerCase()] ?? categoria ?? 'Comercio local';

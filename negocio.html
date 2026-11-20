@@ -5,110 +5,85 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Perfil público del negocio — productos y servicios disponibles.">
   <title>Negocio | Mova</title>
-  <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/global.css">
-  <link rel="stylesheet" href="css/componentes.css">
-  <style>
-    .negocio-cover {
-      width: 100%;
-      aspect-ratio: 16/5;
-      object-fit: cover;
-      background: linear-gradient(135deg, var(--color-primary-light), var(--color-surface-alt));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 5rem;
-    }
-    .negocio-perfil-header {
-      background: var(--color-surface);
-      border-bottom: 1px solid var(--color-border);
-      padding: var(--space-5) 0;
-    }
-    .negocio-perfil-header .container {
-      display: flex;
-      align-items: flex-start;
-      gap: var(--space-5);
-    }
-    .negocio-logo {
-      width: 72px;
-      height: 72px;
-      border-radius: var(--radius-xl);
-      object-fit: cover;
-      border: 3px solid var(--color-surface);
-      box-shadow: var(--shadow-md);
-      flex-shrink: 0;
-      background: var(--color-primary-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-    }
-  </style>
+  <link rel="stylesheet" href="css/componentes.css?v=ticket-1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap">
+  <link rel="stylesheet" href="css/variables.css?v=perfil-1">
+  <link rel="stylesheet" href="css/negocio.css?v=agenda-mes-2">
 </head>
-<body>
+<body class="perfil-negocio">
 
-<!-- HEADER -->
 <header class="site-header">
   <div class="container">
-    <a href="index.html" class="logo">
-      <span class="logo__icon">📍</span>
-      Mova
-    </a>
-    <nav class="header-nav" id="negocio-nav">
-      <a href="index.html" class="btn btn--ghost btn--sm">← Volver</a>
+    <a href="index.html" class="logo" aria-label="Mova, inicio"><img src="imagenes/logo.png" width="100" height="40" alt="Mova"></a>
+    <nav class="header-nav" id="negocio-nav" aria-label="Navegación del negocio">
+      <a href="index.html" class="btn btn--ghost btn--sm">← Explorar</a>
+      <button type="button" class="btn btn--secondary btn--sm" id="compartir-negocio">Compartir</button>
     </nav>
   </div>
 </header>
-
-<main class="main-content">
-
-  <!-- COVER DEL NEGOCIO -->
-  <div id="negocio-cover" class="negocio-cover" aria-hidden="true">🏪</div>
-
-  <!-- INFO PRINCIPAL -->
-  <div class="negocio-perfil-header">
-    <div class="container">
-      <div id="negocio-logo" class="negocio-logo">🏪</div>
-      <div style="flex:1;min-width:0;">
-        <div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;">
-          <h1 id="negocio-nombre" style="font-size:var(--text-2xl);margin:0;">Cargando…</h1>
-          <span id="negocio-verificado" class="verified-badge verified-badge--large" hidden title="Negocio verificado" aria-label="Negocio verificado"></span>
-        </div>
-        <p id="negocio-categoria" class="text-sm text-muted" style="margin:var(--space-1) 0 var(--space-2);"></p>
-        <div style="display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;font-size:var(--text-sm);color:var(--color-text-muted);">
-          <span id="negocio-distancia" style="display:none;font-weight:var(--weight-semibold);color:var(--color-primary);">📍</span>
-          <span id="negocio-telefono" style="display:none;">📞</span>
-          <span id="negocio-ciudad" style="display:none;">🏙</span>
-        </div>
-      </div>
+<main class="main-content container perfil-contenido">
+  <section class="perfil-presentacion" aria-labelledby="negocio-nombre">
+    <div class="perfil-fotos">
+      <div id="negocio-cover" class="negocio-cover" aria-hidden="true">M</div>
+      <div id="negocio-galeria" class="perfil-galeria" aria-label="Fotos del negocio" hidden></div>
     </div>
-  </div>
-
-  <!-- DESCRIPCIÓN -->
-  <div class="container" style="padding-top:var(--space-5);">
-    <p id="negocio-descripcion" class="text-muted" style="max-width:680px;"></p>
-  </div>
-
-  <section class="mapa-seccion" aria-labelledby="mapa-negocio-titulo">
-    <div class="container">
-      <div class="mapa-seccion__encabezado">
-        <div><h2 id="mapa-negocio-titulo">Ubicación del negocio</h2><p id="mapa-negocio-ayuda" class="text-sm text-muted">Compara tu posición con la ubicación registrada por el comerciante.</p></div>
-        <a id="mapa-como-llegar" class="btn btn--ghost btn--sm" target="_blank" rel="noopener noreferrer" hidden>Cómo llegar con Google Maps ↗</a>
+    <div class="perfil-resumen">
+      <p id="negocio-categoria" class="perfil-categoria"></p>
+      <div class="perfil-titulo">
+        <h1 id="negocio-nombre">Cargando negocio…</h1>
+        <span id="negocio-verificado" hidden aria-label="Negocio verificado" title="Negocio verificado">✓</span>
       </div>
-      <div id="mova-map-negocio" class="mapa-mova mapa-mova--detalle" aria-busy="true"></div>
+      <p id="negocio-descripcion" class="perfil-descripcion"></p>
+      <div class="perfil-datos">
+        <span id="negocio-distancia" hidden></span>
+        <span id="negocio-ciudad" hidden></span>
+      </div>
+      <a href="#catalogo" class="btn btn--primary" id="perfil-accion">Explorar catálogo</a>
     </div>
   </section>
 
-  <!-- TABS: Productos / Servicios -->
-  <div class="container" style="padding-top:var(--space-4);">
+  <div class="perfil-distribucion">
+    <aside class="perfil-informacion" aria-label="Información del negocio">
+      <section class="perfil-panel">
+        <h2>Horario de atención</h2>
+        <p>Consulta el horario de atención con el negocio.</p>
+        <a href="#catalogo" id="perfil-horarios" hidden>Ver fechas disponibles →</a>
+      </section>
+      <section class="perfil-panel">
+        <h2>Habla con el negocio</h2>
+        <p id="contacto-no-disponible">Este negocio aún no publicó un teléfono de contacto.</p>
+        <div class="perfil-contacto" id="perfil-contacto" hidden>
+          <a id="negocio-whatsapp" class="btn btn--secondary" target="_blank" rel="noopener noreferrer">Enviar mensaje por WhatsApp</a>
+          <a id="negocio-telefono"></a>
+        </div>
+      </section>
+      <section class="perfil-panel">
+        <h2>Ubicación</h2>
+        <p id="negocio-direccion"></p>
+        <iframe id="negocio-mapa" title="Mapa de ubicación del negocio" loading="lazy" referrerpolicy="no-referrer" hidden></iframe>
+        <a id="negocio-ruta" target="_blank" rel="noopener noreferrer" hidden>Cómo llegar →</a>
+      </section>
+      <section class="perfil-panel">
+        <h2>Reseñas</h2>
+        <p>Aún no hay reseñas publicadas en Mova.</p>
+      </section>
+    </aside>
+    <section class="perfil-catalogo" id="catalogo" aria-labelledby="catalogo-titulo">
+      <div class="perfil-catalogo__titulo">
+        <h2 id="catalogo-titulo">Descubre lo que ofrece</h2>
+        <p>Elige un producto para apartar o un servicio para agendar.</p>
+      </div>
     <div class="tabs" role="tablist" aria-label="Catálogo del negocio">
       <button class="tab-btn active" role="tab" aria-selected="true"
               aria-controls="tab-productos" data-tab="productos" id="tbtn-productos">
-        📦 Productos
+        Productos
       </button>
       <button class="tab-btn" role="tab" aria-selected="false"
               aria-controls="tab-servicios" data-tab="servicios" id="tbtn-servicios">
-        💇 Servicios
+        Servicios
       </button>
     </div>
 
@@ -129,8 +104,8 @@
         </div>
       </div>
     </div>
+    </section>
   </div>
-
 </main>
 
 <!-- MODAL APARTADO/COMPRA -->
@@ -160,24 +135,23 @@
 <!-- NAV MOBILE -->
 <nav class="bottom-nav" aria-label="Navegación móvil">
   <a href="index.html" class="bottom-nav__item">
-    <span class="icon">🏠</span><span>Inicio</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span>Inicio</span>
   </a>
-  <a href="index.html" class="bottom-nav__item">
-    <span class="icon">🔍</span><span>Buscar</span>
+  <a href="index.html#buscar" class="bottom-nav__item">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></svg><span>Buscar</span>
   </a>
-  <a href="login.html" class="bottom-nav__item" id="negocio-mis-citas">
-    <span class="icon">🗓</span><span>Mis Citas</span>
+  <a href="login.html?redirect=mis-citas.html" class="bottom-nav__item" id="negocio-mis-citas">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6m10-6v6M3 11h18"/></svg><span>Agenda</span>
   </a>
   <a href="login.html" class="bottom-nav__item">
-    <span class="icon">👤</span><span>Perfil</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5v3"/></svg><span>Perfil</span>
   </a>
 </nav>
 
 <script type="module">
   import { api, ApiError, formatMXN, formatFecha, toast, btnLoading } from './js/api.js';
-  import { AgendaCalendario, mostrarTicketRecoleccion } from './js/agenda.js';
+  import { AgendaCalendario, mostrarTicketRecoleccion } from './js/agenda.js?v=agenda-mes-1';
   import { geo, Geolocalizacion } from './js/geolocalizacion.js';
-  import { MapaMova } from './js/mapa.js';
 
   // ── Leer negocio_id de la URL ─────────────────────────────────
   const params    = new URLSearchParams(window.location.search);
@@ -194,7 +168,7 @@
         const enlace = document.createElement('a');
         enlace.href = 'mis-citas.html';
         enlace.className = 'btn btn--primary btn--sm';
-        enlace.textContent = 'Mis Citas y Apartados';
+        enlace.textContent = 'Agenda';
         document.getElementById('negocio-nav').appendChild(enlace);
         document.getElementById('negocio-mis-citas').href = 'mis-citas.html';
       }
@@ -202,16 +176,30 @@
   })();
 
   // ── Tabs ──────────────────────────────────────────────────────
+  let catalogoElegido = false;
   document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+    btn.tabIndex = btn.classList.contains('active') ? 0 : -1;
     btn.addEventListener('click', () => {
+      catalogoElegido = true;
       document.querySelectorAll('.tab-btn').forEach(b => {
         b.classList.remove('active');
         b.setAttribute('aria-selected', 'false');
+        b.tabIndex = -1;
       });
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
       btn.setAttribute('aria-selected', 'true');
+      btn.tabIndex = 0;
       document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+    });
+    btn.addEventListener('keydown', event => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      const tabs = [...document.querySelectorAll('.tab-btn[data-tab]')];
+      const siguiente = event.key === 'Home' ? tabs[0]
+        : event.key === 'End' ? tabs[tabs.length - 1] : tabs.find(tab => tab !== btn);
+      siguiente.click();
+      siguiente.focus();
     });
   });
 
@@ -227,22 +215,108 @@
   });
 
   function abrirModal(modal) {
+    modal._elementoAnterior = document.activeElement;
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
+    modal.querySelector('.modal__close').focus();
   }
 
   function cerrarModal(modal) {
     modal.classList.remove('open');
     document.body.style.overflow = '';
+    modal._elementoAnterior?.focus();
   }
+
+  document.addEventListener('keydown', event => {
+    const modal = document.querySelector('.modal-backdrop.open');
+    if (!modal) return;
+    if (event.key === 'Escape') cerrarModal(modal);
+    if (event.key === 'Tab') {
+      const controles = [...modal.querySelectorAll('button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), [tabindex="0"]')]
+        .filter(elemento => elemento.getClientRects().length);
+      const primero = controles[0];
+      const ultimo = controles[controles.length - 1];
+      if (event.shiftKey && document.activeElement === primero) {
+        event.preventDefault();
+        ultimo.focus();
+      } else if (!event.shiftKey && document.activeElement === ultimo) {
+        event.preventDefault();
+        primero.focus();
+      }
+    }
+  });
 
   // ── Cargar datos del negocio ──────────────────────────────────
   let negocioData = null;
-  const mapaNegocio = new MapaMova('#mova-map-negocio', { modo: 'detalle' });
+  let totalProductos = null;
+  let totalServicios = null;
+  let fotosProductos = [];
+
+  document.getElementById('compartir-negocio').addEventListener('click', async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: document.title, url: location.href });
+      } else {
+        await navigator.clipboard.writeText(location.href);
+        toast('Enlace del negocio copiado.', 'success');
+      }
+    } catch (error) {
+      if (error.name !== 'AbortError') toast('Puedes copiar el enlace desde la barra de direcciones.', 'warning');
+    }
+  });
+
+  document.getElementById('perfil-horarios').addEventListener('click', () => {
+    document.getElementById('tbtn-servicios').click();
+  });
+
+  function actualizarCatalogo() {
+    if (totalProductos === null || totalServicios === null) return;
+    const accion = document.getElementById('perfil-accion');
+    accion.textContent = totalServicios && !totalProductos ? 'Ver servicios y fechas' : 'Explorar catálogo';
+    document.getElementById('perfil-horarios').hidden = !totalServicios;
+    if (!catalogoElegido && totalServicios && !totalProductos) {
+      document.getElementById('tbtn-servicios').click();
+    }
+  }
+
+  function renderGaleria() {
+    const cover = document.getElementById('negocio-cover');
+    const galeria = document.getElementById('negocio-galeria');
+    const iniciales = negocioData.nombre.trim().split(/\s+/).slice(0, 2)
+      .map(palabra => Array.from(palabra)[0] ?? '').join('').toUpperCase();
+    const fotos = [...new Set([negocioData.logo_url, ...fotosProductos].filter(Boolean))].slice(0, 6);
+    cover.textContent = iniciales;
+    galeria.replaceChildren();
+    galeria.hidden = fotos.length < 2;
+    function seleccionarFoto(url, boton) {
+      cover.textContent = iniciales;
+      const imagen = document.createElement('img');
+      imagen.src = url;
+      imagen.alt = '';
+      imagen.addEventListener('error', () => imagen.remove());
+      cover.append(imagen);
+      galeria.querySelectorAll('button').forEach(item => item.setAttribute('aria-pressed', String(item === boton)));
+    }
+    fotos.forEach((url, indice) => {
+      const boton = document.createElement('button');
+      boton.type = 'button';
+      boton.setAttribute('aria-label', `Ver foto ${indice + 1} de ${negocioData.nombre}`);
+      boton.setAttribute('aria-pressed', String(indice === 0));
+      const imagen = document.createElement('img');
+      imagen.src = url;
+      imagen.alt = '';
+      imagen.loading = 'lazy';
+      imagen.addEventListener('error', () => boton.remove());
+      boton.append(imagen);
+      boton.addEventListener('click', () => seleccionarFoto(url, boton));
+      galeria.append(boton);
+      if (indice === 0) seleccionarFoto(url, boton);
+    });
+  }
 
   async function cargarNegocio() {
     try {
-      const coords = await geo.obtenerPosicion();
+      const coords = await geo.obtenerPosicion({ solicitarPermiso: false });
 
       const data = await api.get('negocios.php', {
         action: 'perfil',
@@ -253,11 +327,12 @@
 
       negocioData = data.negocio;
       _renderPerfil(negocioData, coords);
-      mapaNegocio.render({ usuario: coords, negocios: [negocioData] });
-      document.getElementById('mova-map-negocio').setAttribute('aria-busy', 'false');
       await Promise.all([cargarProductos(), cargarServicios()]);
     } catch (err) {
       document.getElementById('negocio-nombre').textContent = 'Negocio no encontrado';
+      document.getElementById('negocio-descripcion').textContent = err.message;
+      document.querySelector('.perfil-distribucion').hidden = true;
+      document.getElementById('perfil-accion').hidden = true;
     }
   }
 
@@ -265,11 +340,6 @@
     document.title = `${n.nombre} | Mova`;
     document.getElementById('negocio-nombre').textContent    = n.nombre;
     document.getElementById('negocio-descripcion').textContent = n.descripcion ?? '';
-    if (Number.isFinite(Number(n.latitud)) && Number.isFinite(Number(n.longitud))) {
-      const comoLlegar = document.getElementById('mapa-como-llegar');
-      comoLlegar.href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${n.latitud},${n.longitud}`)}`;
-      comoLlegar.hidden = false;
-    }
 
     // Categoría
     const catEl = document.getElementById('negocio-categoria');
@@ -279,27 +349,56 @@
     if (n.verificado) {
       const v = document.getElementById('negocio-verificado');
       v.hidden = false;
+      v.style.color = 'var(--color-primary)';
+      v.style.fontWeight = 'bold';
     }
+
+    renderGaleria();
 
     // Distancia
     if (n.distancia_km != null) {
       const dEl = document.getElementById('negocio-distancia');
-      dEl.style.display = 'inline';
-      dEl.textContent = `📍 ${Geolocalizacion.formatDistancia(parseFloat(n.distancia_km))}`;
+      dEl.hidden = false;
+      dEl.textContent = `${Geolocalizacion.formatDistancia(parseFloat(n.distancia_km))} de tu ubicación`;
     }
 
     // Teléfono
     if (n.telefono_contacto) {
       const tEl = document.getElementById('negocio-telefono');
-      tEl.style.display = 'inline';
-      tEl.innerHTML = `📞 <a href="tel:${n.telefono_contacto}">${n.telefono_contacto}</a>`;
+      const digitos = n.telefono_contacto.replace(/\D/g, '');
+      if (digitos) {
+        document.getElementById('perfil-contacto').hidden = false;
+        document.getElementById('contacto-no-disponible').hidden = true;
+        tEl.href = `tel:${n.telefono_contacto.startsWith('+') ? '+' : ''}${digitos}`;
+        tEl.textContent = `Llamar al ${n.telefono_contacto}`;
+        const whatsapp = document.getElementById('negocio-whatsapp');
+        whatsapp.href = `https://wa.me/${digitos.length === 10 ? '52' : ''}${digitos}`;
+      }
     }
 
     // Ciudad
     if (n.ciudad) {
       const cEl = document.getElementById('negocio-ciudad');
-      cEl.style.display = 'inline';
-      cEl.textContent = `🏙 ${n.ciudad}`;
+      cEl.hidden = false;
+      cEl.textContent = n.ciudad;
+    }
+
+    const direccion = [n.direccion, n.ciudad].filter(Boolean).join(', ');
+    document.getElementById('negocio-direccion').textContent = direccion || 'Ubicación pendiente de publicar.';
+    const lat = Number(n.latitud);
+    const lon = Number(n.longitud);
+    const tieneCoordenadas = n.latitud != null && n.longitud != null
+      && Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
+    const ruta = document.getElementById('negocio-ruta');
+    if (tieneCoordenadas || direccion) {
+      ruta.hidden = false;
+      ruta.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tieneCoordenadas ? lat + ',' + lon : direccion)}`;
+    }
+    if (tieneCoordenadas) {
+      const mapa = document.getElementById('negocio-mapa');
+      mapa.hidden = false;
+      const bbox = [lon - .006, lat - .004, lon + .006, lat + .004].join(',');
+      mapa.src = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${lat},${lon}`;
     }
   }
 
@@ -309,6 +408,11 @@
     try {
       const data = await api.get('productos.php', { action: 'listar', negocio_id: negocioId });
       const productos = data.productos ?? [];
+      totalProductos = productos.length;
+      document.getElementById('tbtn-productos').textContent = `Productos (${totalProductos})`;
+      fotosProductos = productos.map(producto => producto.imagen_url).filter(Boolean);
+      renderGaleria();
+      actualizarCatalogo();
 
       if (!productos.length) {
         grid.innerHTML = `
@@ -325,7 +429,7 @@
           <div class="producto-card__img">
             ${p.imagen_url
               ? `<img src="${esc(p.imagen_url)}" alt="${esc(p.titulo)}" loading="lazy">`
-              : `<div class="producto-card__img-placeholder">📦</div>`}
+              : `<div class="producto-card__img-placeholder">${esc(p.titulo.slice(0, 2).toUpperCase())}</div>`}
             <div class="producto-card__stock-badge${p.stock_disponible == 0 ? ' agotado' : ''}">
               ${p.stock_disponible == 0 ? '¡Agotado!' : `${p.stock_disponible} disponible${p.stock_disponible != 1 ? 's' : ''}`}
             </div>
@@ -340,7 +444,7 @@
                 data-precio="${p.precio}"
                 data-stock="${p.stock_disponible}"
                 ${p.stock_disponible == 0 ? 'disabled' : ''}>
-                ${p.stock_disponible == 0 ? 'Agotado' : '🛒 Apartar'}
+                ${p.stock_disponible == 0 ? 'Agotado' : 'Apartar'}
               </button>
             </div>
           </div>
@@ -369,14 +473,17 @@
         Precio: <strong>${formatMXN(producto.precio)}</strong>
       </p>
       <div class="form-group">
-        <label class="form-label">Modalidad de pago</label>
+        <label class="form-label" for="tipo-pago">Modalidad de pago</label>
+        <div class="pago-selector">
+        <svg class="pago-selector__icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M5 9h1M18 15h1"/></svg>
         <select id="tipo-pago" class="form-control">
-          <option value="efectivo_tienda">💵 Efectivo en tienda (válido 3 horas)</option>
-          ${negocioData?.pago_online_habilitado
-            ? `<option value="online">💳 Pago en línea (Click &amp; Collect)</option>`
+          <option value="efectivo_tienda">Efectivo en tienda (válido 3 horas)</option>
+          ${negocioData?.plan_suscripcion === 'pro'
+            ? `<option value="online">Pago en línea (Click &amp; Collect)</option>`
             : ''}
         </select>
-        ${!negocioData?.pago_online_habilitado
+        </div>
+        ${negocioData?.plan_suscripcion !== 'pro'
           ? `<span class="form-hint">Este negocio solo acepta pago en efectivo.</span>`
           : ''}
       </div>
@@ -385,7 +492,7 @@
         <input type="text" id="notas-apartado" class="form-control" placeholder="Ej: color azul, talla M…" maxlength="300">
       </div>
       <div id="apartado-error" class="alert alert--danger" style="display:none;"></div>
-      <div class="alert alert--warning" style="margin-bottom:0;">
+      <div class="alert alert--warning apartado-aviso" style="margin-bottom:0;">
         ⏰ El apartado en efectivo expira automáticamente a las <strong>3 horas</strong> si no confirmas el pago en tienda.
       </div>
       <div class="modal__footer" style="padding:var(--space-5) 0 0;border:none;">
@@ -435,6 +542,9 @@
     try {
       const data = await api.get('productos.php', { action: 'servicios', negocio_id: negocioId });
       const servicios = data.servicios ?? [];
+      totalServicios = servicios.length;
+      document.getElementById('tbtn-servicios').textContent = `Servicios (${totalServicios})`;
+      actualizarCatalogo();
 
       if (!servicios.length) {
         lista.innerHTML = `
@@ -456,17 +566,15 @@
           <div class="servicio-card__footer">
             <div class="servicio-card__precios">
               <div class="servicio-card__precio-estimado">${formatMXN(s.precio_estimado)}</div>
-              <div class="servicio-card__anticipo">Garantía: <strong>${formatMXN(s.monto_anticipo)}</strong></div>
+              <div class="servicio-card__anticipo">Anticipo: <strong>${formatMXN(s.monto_anticipo)}</strong></div>
             </div>
             <button class="btn btn--primary btn-agendar"
               data-id="${s.id}"
               data-nombre="${esc(s.nombre)}"
               data-duracion="${s.duracion_minutos}"
               data-precio="${s.precio_estimado}"
-              data-anticipo="${s.monto_anticipo}"
-              data-permite-anticipo="${s.permite_anticipo}"
-              data-permite-total="${s.permite_pago_total}">
-              🗓 Agendar
+              data-anticipo="${s.monto_anticipo}">
+              Agendar cita
             </button>
           </div>
         </article>`).join('');
@@ -478,8 +586,6 @@
           duracionMinutos:  parseInt(btn.dataset.duracion),
           precioEstimado:   parseFloat(btn.dataset.precio),
           montoAnticipo:    parseFloat(btn.dataset.anticipo),
-          permiteAnticipo:  Number(btn.dataset.permiteAnticipo) === 1,
-          permitePagoTotal: Number(btn.dataset.permiteTotal) === 1,
         }));
       });
     } catch {
@@ -498,8 +604,6 @@
       duracionMinutos: servicio.duracionMinutos,
       precioEstimado:  servicio.precioEstimado,
       montoAnticipo:   servicio.montoAnticipo,
-      permiteAnticipo: servicio.permiteAnticipo,
-      permitePagoTotal: servicio.permitePagoTotal,
       nombreServicio:  servicio.nombre,
       contenedor:      body,
       onCitaCreada:    (cita) => {

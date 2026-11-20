@@ -7,7 +7,7 @@
  */
 
 import { api, ApiError, formatMXN, formatFecha, toast, btnLoading, badgeEstadoCita, badgeEstadoApartado } from './api.js';
-import { confirmarCita, cancelarCita } from './agenda.js';
+import { iniciarCitaConPin, confirmarCita, completarCita, cancelarCita } from './agenda.js';
 
 // ─── Estado del panel ─────────────────────────────────────────────
 const estado = {
@@ -31,14 +31,14 @@ export async function initPanel() {
   try {
     const me = await api.get('auth.php', { action: 'me' });
     if (!me.autenticado || me.usuario.rol !== 'negocio') {
-      window.location.href = '/hackathon/login.html?redirect=panel-negocio.html';
+      window.location.href = 'login.html?redirect=panel-negocio.html';
       return;
     }
     estado.usuario = me.usuario;
     estado.negocioId = me.negocio?.id ?? null;
     _renderHeaderUsuario(me.usuario, me.negocio);
   } catch {
-    window.location.href = '/hackathon/login.html?redirect=panel-negocio.html';
+    window.location.href = 'login.html?redirect=panel-negocio.html';
     return;
   }
 
@@ -124,28 +124,28 @@ async function cargarDashboard() {
       <p class="section-subtitle">Resumen de tu negocio hoy.</p>
       <div class="grid grid--4" style="margin-bottom:var(--space-8);">
         <div class="stat-card">
-          <div class="stat-card__icon stat-card__icon--primary">📦</div>
+          <div class="stat-card__icon stat-card__icon--primary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 7 9-4 9 4v10l-9 4-9-4V7Zm0 0 9 4 9-4M12 11v10M7.5 5l9 4"/></svg></div>
           <div>
             <div class="stat-card__value">${kpis.total_productos ?? 0}</div>
             <div class="stat-card__label">Productos activos</div>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-card__icon stat-card__icon--success">✅</div>
+          <div class="stat-card__icon stat-card__icon--success"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18m-12 5 2 2 4-4"/></svg></div>
           <div>
             <div class="stat-card__value">${kpis.citas_hoy ?? 0}</div>
             <div class="stat-card__label">Citas hoy</div>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-card__icon stat-card__icon--warning">🛒</div>
+          <div class="stat-card__icon stat-card__icon--warning"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2 10h11l3-7H6"/><circle cx="9" cy="19" r="1"/><circle cx="18" cy="19" r="1"/></svg></div>
           <div>
             <div class="stat-card__value">${kpis.apartados_pendientes ?? 0}</div>
             <div class="stat-card__label">Apartados pendientes</div>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-card__icon stat-card__icon--success">💰</div>
+          <div class="stat-card__icon stat-card__icon--success"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M5 9h1m12 6h1"/></svg></div>
           <div>
             <div class="stat-card__value">${formatMXN(kpis.ingresos_mes ?? 0)}</div>
             <div class="stat-card__label">Ingresos este mes</div>
@@ -158,7 +158,7 @@ async function cargarDashboard() {
           <div class="monedero-banner__monto">${formatMXN(kpis.saldo_escrow ?? 0)}</div>
           <div class="monedero-banner__sub">Se libera al completar las citas agendadas</div>
         </div>
-        <span style="font-size:3rem;">💳</span>
+        <svg class="monedero-banner__icono" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h5"/></svg>
       </div>`;
   } catch (err) {
     el.innerHTML = `<div class="alert alert--danger">Error al cargar el dashboard. ${err.message}</div>`;
@@ -420,8 +420,8 @@ function _renderServicios() {
         ${s.descripcion ? `<p class="servicio-card__desc">${_escape(s.descripcion)}</p>` : ''}
         <div class="servicio-card__footer">
           <div class="servicio-card__precios">
-            <div class="servicio-card__precio-estimado">Precio fijo: ${formatMXN(s.precio_estimado)}</div>
-            <div class="servicio-card__anticipo">Garantía: <strong>${formatMXN(s.monto_anticipo)}</strong> · ${Number(s.permite_pago_total) ? 'Pago total disponible' : 'Solo garantía'}</div>
+            <div class="servicio-card__precio-estimado">${formatMXN(s.precio_estimado)}</div>
+            <div class="servicio-card__anticipo">Anticipo: <strong>${formatMXN(s.monto_anticipo)}</strong></div>
           </div>
           <div class="flex gap-2">
             <button class="btn btn--ghost btn--sm btn-editar-servicio" data-id="${s.id}">✏️ Editar</button>
@@ -464,31 +464,17 @@ function _abrirModalServicio(servicio) {
                  value="${servicio?.duracion_minutos ?? '60'}">
         </div>
         <div class="form-group">
-          <label class="form-label">Precio fijo (MXN) <span class="required">*</span></label>
+          <label class="form-label">Precio estimado (MXN) <span class="required">*</span></label>
           <input type="number" name="precio_estimado" class="form-control" step="0.01" min="0" required
                  value="${servicio?.precio_estimado ?? ''}">
         </div>
       </div>
-      <div class="grid grid--2">
-        <div class="form-group">
-          <label class="form-label">Tipo de garantía</label>
-          <select name="tipo_garantia" class="form-control">
-            <option value="ninguna" ${servicio?.tipo_garantia === 'ninguna' ? 'selected' : ''}>Sin anticipo</option>
-            <option value="porcentaje" ${servicio?.tipo_garantia === 'porcentaje' ? 'selected' : ''}>Porcentaje del precio</option>
-            <option value="fijo" ${!servicio || servicio?.tipo_garantia === 'fijo' ? 'selected' : ''}>Cantidad fija</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Valor de la garantía</label>
-          <input type="number" name="valor_garantia" class="form-control" step="0.01" min="0" value="${servicio?.valor_garantia ?? '0'}">
-          <span class="form-hint">Porcentaje o pesos, según el tipo seleccionado.</span>
-        </div>
+      <div class="form-group">
+        <label class="form-label">Monto de anticipo (MXN) <span class="required">*</span></label>
+        <input type="number" name="monto_anticipo" class="form-control" step="0.01" min="0" required
+               value="${servicio?.monto_anticipo ?? ''}">
+        <span class="form-hint">Monto que el cliente paga al agendar. Se retiene hasta completar la cita.</span>
       </div>
-      <fieldset class="panel-onboarding__location">
-        <legend>Opciones que verá el cliente</legend>
-        <label class="form-check"><input type="checkbox" name="permite_anticipo" ${!servicio || Number(servicio?.permite_anticipo) ? 'checked' : ''}> Reservar pagando solo la garantía</label>
-        <label class="form-check"><input type="checkbox" name="permite_pago_total" ${!servicio || Number(servicio?.permite_pago_total) ? 'checked' : ''}> Pagar el servicio completo</label>
-      </fieldset>
       <div id="form-svc-error" class="alert alert--danger" style="display:none;"></div>
     </form>`,
     [
@@ -502,10 +488,8 @@ function _abrirModalServicio(servicio) {
     const errEl   = modal.querySelector('#form-svc-error');
     const btn     = modal.querySelector('#btn-guardar-svc');
     const payload = Object.fromEntries(new FormData(form));
-    payload.permite_anticipo = form.elements.permite_anticipo.checked;
-    payload.permite_pago_total = form.elements.permite_pago_total.checked;
 
-    if (!payload.nombre?.trim() || !payload.precio_estimado || !payload.duracion_minutos || (!payload.permite_anticipo && !payload.permite_pago_total)) {
+    if (!payload.nombre?.trim() || !payload.precio_estimado || !payload.duracion_minutos) {
       errEl.textContent   = 'Nombre, duración y precio son obligatorios.';
       errEl.style.display = 'flex';
       return;
@@ -555,7 +539,7 @@ async function cargarCitas() {
     <div class="flex gap-2 mb-6" style="flex-wrap:wrap;">
       ${['todas','agendada','confirmada','en_curso','completada'].map(e =>
         `<button class="chip filtro-cita${e==='todas'?' active':''}" data-estado="${e}">
-          ${e === 'todas' ? '📋 Todas' : e.charAt(0).toUpperCase() + e.slice(1).replace('_',' ')}
+          ${e === 'todas' ? '<svg class="panel-icono-cita" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 10h6m-6 4h6m-6 4h4"/></svg> Todas' : e.charAt(0).toUpperCase() + e.slice(1).replace('_',' ')}
         </button>`).join('')}
     </div>
     <div id="citas-lista"><span class="spinner"></span></div>`;
@@ -591,7 +575,7 @@ function _renderCitas(el) {
   if (!estado.citas.length) {
     el.innerHTML = `
       <div class="empty-state">
-        <div class="empty-state__icon">🗓</div>
+        <div class="empty-state__icon"><svg class="panel-icono-cita" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></svg></div>
         <div class="empty-state__title">Sin citas</div>
         <p class="empty-state__desc">No hay citas con este filtro.</p>
       </div>`;
@@ -604,15 +588,18 @@ function _renderCitas(el) {
         <div class="cita-card__header">
           <div>
             <div class="cita-card__servicio">${_escape(c.nombre_servicio ?? 'Servicio')}</div>
-            <div class="cita-card__cliente">👤 ${_escape(c.nombre_cliente ?? 'Cliente')}</div>
+            <div class="cita-card__cliente"><svg class="panel-icono-cita" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5v2"/></svg> ${_escape(c.nombre_cliente ?? 'Cliente')}</div>
           </div>
           ${badgeEstadoCita(c.estado)}
         </div>
         <div class="cita-card__fecha">
-          📅 ${formatFecha(c.fecha_hora_inicio, true)}
+          <svg class="panel-icono-cita" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></svg> ${formatFecha(c.fecha_hora_inicio, true)}
           <span class="text-muted text-xs">(${c.duracion_minutos ?? '?'} min)</span>
         </div>
-        ${c.prorroga_estado === 'aceptada' ? `<div class="alert alert--success">Prórroga aceptada: ${Number(c.prorroga_minutos)} minutos.</div>` : ''}
+        ${c.estado === 'agendada' || c.estado === 'confirmada' ? `
+          <div class="cita-card__pin">
+            <svg class="panel-icono-cita" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9m-3 3 3 3m-6 0 3 3"/></svg> PIN del cliente: <span>${c.pin_verificacion ?? '????'}</span>
+          </div>` : ''}
         <div class="cita-card__acciones">
           ${_botonesAccionCita(c)}
         </div>
@@ -628,24 +615,15 @@ function _renderCitas(el) {
 function _botonesAccionCita(cita) {
   const btns = [];
   if (cita.estado === 'agendada') {
-    btns.push(`<button class="btn btn--primary btn--sm" data-accion-cita="confirmar" data-id="${cita.id}">✅ Confirmar</button>`);
-    btns.push(`<button class="btn btn--danger btn--sm" data-accion-cita="cancelar" data-id="${cita.id}">✖ Cancelar</button>`);
+    btns.push(`<button class="btn btn--primary btn--sm" data-accion-cita="confirmar" data-id="${cita.id}">Confirmar</button>`);
+    btns.push(`<button class="btn btn--danger btn--sm" data-accion-cita="cancelar" data-id="${cita.id}">Cancelar</button>`);
   }
   if (cita.estado === 'confirmada') {
-    btns.push(`<button class="btn btn--ghost btn--sm" data-accion-cita="generar_checkin" data-id="${cita.id}">Mi código de llegada</button>`);
-    btns.push(`<button class="btn btn--success btn--sm" data-accion-cita="validar_checkin" data-id="${cita.id}">Validar cliente</button>`);
-    btns.push(`<button class="btn btn--ghost btn--sm" data-accion-cita="prorroga" data-id="${cita.id}">Pedir prórroga</button>`);
-    btns.push(`<button class="btn btn--danger btn--sm" data-accion-cita="cancelar" data-id="${cita.id}">✖ Cancelar</button>`);
+    btns.push(`<button class="btn btn--success btn--sm" data-accion-cita="iniciar" data-id="${cita.id}">Iniciar con PIN</button>`);
+    btns.push(`<button class="btn btn--danger btn--sm" data-accion-cita="cancelar" data-id="${cita.id}">Cancelar</button>`);
   }
   if (cita.estado === 'en_curso') {
-    btns.push(`<button class="btn btn--success btn--sm" data-accion-cita="generar_final" data-id="${cita.id}">Generar código final</button>`);
-  }
-  if (cita.estado === 'no_show' && cita.estado_flujo === 'no_show_pendiente') {
-    btns.push(`<button class="btn btn--primary btn--sm" data-accion-cita="resolver_no_show" data-id="${cita.id}">Resolver garantía</button>`);
-  }
-  if (cita.prorroga_estado === 'solicitada' && Number(cita.prorroga_solicitada_por) !== Number(estado.usuario?.id)) {
-    btns.push(`<button class="btn btn--success btn--sm" data-accion-cita="aceptar_prorroga" data-id="${cita.id}">Aceptar prórroga</button>`);
-    btns.push(`<button class="btn btn--ghost btn--sm" data-accion-cita="rechazar_prorroga" data-id="${cita.id}">Rechazar</button>`);
+    btns.push(`<button class="btn btn--success btn--sm" data-accion-cita="completar" data-id="${cita.id}">Completar</button>`);
   }
   return btns.join('');
 }
@@ -659,31 +637,18 @@ async function _manejarAccionCita(btn) {
     if (accion === 'confirmar') {
       await confirmarCita(citaId);
       toast('Cita confirmada.', 'success');
-    } else if (accion === 'generar_checkin') {
-      const data = await api.post('citas.php', { action: 'generar_checkin' }, { cita_id: citaId });
-      alert(`Tu código temporal de llegada es: ${data.codigo}\n\nEl cliente debe validarlo.`);
-    } else if (accion === 'validar_checkin') {
-      const codigo = prompt('Ingresa el código de 6 dígitos generado por el cliente:');
-      if (!codigo) { btnLoading(btn, false); return; }
-      const data = await api.post('citas.php', { action: 'validar_checkin' }, { cita_id: citaId, codigo });
-      toast(data.mensaje, 'success');
-    } else if (accion === 'prorroga') {
-      const minutos = Number(prompt('Minutos de prórroga: 10, 15 o 30', '15'));
-      if (!minutos) { btnLoading(btn, false); return; }
-      const data = await api.post('citas.php', { action: 'solicitar_prorroga' }, { cita_id: citaId, minutos }); toast(data.mensaje, 'success');
-    } else if (accion === 'aceptar_prorroga' || accion === 'rechazar_prorroga') {
-      const data = await api.post('citas.php', { action: 'responder_prorroga' }, { cita_id: citaId, aceptar: accion === 'aceptar_prorroga' }); toast(data.mensaje, 'success');
-    } else if (accion === 'generar_final') {
-      const data = await api.post('citas.php', { action: 'generar_final' }, { cita_id: citaId });
-      alert(`Código final: ${data.codigo}\n\nEl cliente debe confirmarlo. Si no responde en 2 horas, comenzará automáticamente la retención de 24 horas.`);
-    } else if (accion === 'resolver_no_show') {
-      const porcentaje = Number(prompt('Porcentaje de la garantía a retener: 0, 25, 50, 75 o 100', '100'));
-      if (![0,25,50,75,100].includes(porcentaje)) { toast('Porcentaje inválido.', 'warning'); btnLoading(btn, false); return; }
-      const data = await api.post('citas.php', { action: 'resolver_no_show' }, { cita_id: citaId, porcentaje }); toast(data.mensaje, 'success');
+    } else if (accion === 'completar') {
+      await completarCita(citaId);
+      toast('Cita completada. Anticipo liberado a tu saldo.', 'success');
     } else if (accion === 'cancelar') {
       if (!confirm('¿Cancelar esta cita?')) { btnLoading(btn, false); return; }
       await cancelarCita(citaId);
       toast('Cita cancelada.', 'success');
+    } else if (accion === 'iniciar') {
+      const pin = prompt('Ingresa el PIN de 4 dígitos que muestra el cliente:');
+      if (!pin) { btnLoading(btn, false); return; }
+      await iniciarCitaConPin(citaId, pin);
+      toast('¡Cita en curso!', 'success');
     }
     await _fetchCitas('');
   } catch (err) {
@@ -873,7 +838,13 @@ function _mostrarFormCrearNegocio() {
           <button class="btn btn--ghost btn--sm" type="button" id="btn-ubicacion-negocio">Usar mi ubicación actual</button>
           <span id="ubicacion-negocio-estado" class="form-hint"></span>
         </fieldset>
-        <div class="alert alert--info">Las cancelaciones del cliente son gratuitas hasta la hora exacta de la cita. La garantía sólo puede aplicarse cuando el cliente no se presenta.</div>
+        <div class="form-group">
+          <label class="form-label">Cancelación sin penalización</label>
+          <select class="form-control" name="ventana_cancelacion_horas">
+            <option value="3">3 horas antes</option><option value="12">12 horas antes</option>
+            <option value="24" selected>24 horas antes</option><option value="48">48 horas antes</option>
+          </select>
+        </div>
         <div id="crear-negocio-error" class="alert alert--danger" hidden></div>
         <button class="btn btn--primary btn--full btn--lg" id="btn-crear-negocio" type="submit">Activar mi dashboard</button>
       </form>

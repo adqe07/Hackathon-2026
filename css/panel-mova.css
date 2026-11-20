@@ -1,0 +1,93 @@
+body.panel-mova {
+  --color-bg: var(--color-mova-fondo);
+  --color-surface: var(--color-mova-superficie);
+  --color-text: var(--color-mova-texto);
+  --color-text-muted: var(--color-mova-texto-suave);
+  --color-text-light: #786667;
+  --color-surface-alt: var(--color-primary-light);
+  --color-border: var(--color-primary-light);
+  --focus-ring-primary: rgba(166, 37, 38, .2);
+  color-scheme: light;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.panel-mova .site-header,
+.panel-mova .panel-sidebar,
+.panel-mova .bottom-nav,
+.panel-mova .modal,
+.panel-mova .stat-card,
+.panel-mova .producto-card,
+.panel-mova .servicio-card,
+.panel-mova .cita-card {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.panel-mova .site-header { box-shadow: none; }
+.panel-mova .site-header .logo img { width: 110px; height: 44px; object-fit: contain; }
+.panel-mova .panel-main { background: var(--color-bg); }
+.panel-mova .panel-nav__item { color: var(--color-primary); }
+.panel-mova .panel-nav__item svg.icon { color: var(--color-secondary); }
+.panel-mova .panel-nav__item:hover,
+.panel-mova .panel-nav__item.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+.panel-mova .panel-nav__item:hover svg.icon,
+.panel-mova .panel-nav__item.active svg.icon { color: var(--color-primary); }
+
+.panel-mova .panel-nav__item svg.icon,
+.panel-mova .bottom-nav svg.icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.panel-mova .panel-icono-cita {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  vertical-align: -3px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.panel-mova .stat-card__icon {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+.panel-mova .stat-card__icon svg,
+.panel-mova .monedero-banner__icono {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.panel-mova .monedero-banner__icono { width: 44px; height: 44px; flex-shrink: 0; }
+
+.panel-mova .monedero-banner {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: var(--color-on-action);
+}
+
+.panel-mova .form-control {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.panel-mova .form-control:focus { border-color: var(--color-primary); }
+.panel-mova .modal__header,
+.panel-mova .modal__footer { border-color: var(--color-border); }

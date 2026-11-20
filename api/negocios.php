@@ -209,7 +209,7 @@ function handlePerfil(string $method): never
         'latitud'                   => $negocio['latitud'] !== null ? (float) $negocio['latitud'] : null,
         'longitud'                  => $negocio['longitud'] !== null ? (float) $negocio['longitud'] : null,
         'logo_url'                  => $negocio['logo_url'],
-        'pago_online_habilitado'    => $negocio['plan_suscripcion'] === 'pro',
+        'plan_suscripcion'          => $negocio['plan_suscripcion'],
         'ventana_cancelacion_horas' => (int) $negocio['ventana_cancelacion_horas'],
         'verificado'                => (bool) $negocio['verificado'],
         'distancia_km'              => $negocio['distancia_km'] !== null ? round((float) $negocio['distancia_km'], 2) : null,

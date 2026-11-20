@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Entrar | Mova</title>
   <meta name="description" content="Inicia sesión o crea tu cuenta en Mova.">
-  <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/componentes.css">
+  <link rel="stylesheet" href="css/variables.css?v=acceso-1">
   <style>
-    body {
+    body.auth-page {
+      --color-bg: var(--color-mova-fondo);
+      --color-surface: var(--color-mova-superficie);
+      --color-text: var(--color-mova-texto);
+      --color-text-muted: var(--color-mova-texto-suave);
+      --color-surface-alt: var(--color-primary-light);
+      --color-border: var(--color-primary-light);
       background: var(--color-bg);
+      color-scheme: light;
     }
 
     .auth-layout {
@@ -21,37 +27,28 @@
     }
 
     @media (min-width: 768px) {
-      .auth-layout {
-        grid-template-columns: 1fr 1fr;
-      }
+      .auth-layout { grid-template-columns: 1fr 1fr; }
     }
 
     .auth-branding {
       display: none;
-      background: linear-gradient(145deg, var(--color-primary) 0%, #9C6FFF 100%);
-      color: #fff;
+      background: linear-gradient(145deg, var(--color-primary-light), var(--color-secondary));
+      color: var(--color-text);
       padding: var(--space-12);
       flex-direction: column;
       justify-content: center;
       gap: var(--space-6);
     }
 
-    @media (min-width: 768px) {
-      .auth-branding {
-        display: flex;
-      }
-    }
+    @media (min-width: 768px) { .auth-branding { display: flex; } }
 
     .auth-branding h2 {
-      color: #fff;
+      color: inherit;
       font-size: var(--text-3xl);
       line-height: var(--leading-tight);
     }
 
-    .auth-branding p {
-      opacity: 0.85;
-      font-size: var(--text-lg);
-    }
+    .auth-branding p { color: #542024; font-size: var(--text-lg); }
 
     .auth-branding .feature-list {
       display: flex;
@@ -64,12 +61,18 @@
       align-items: center;
       gap: var(--space-3);
       font-size: var(--text-base);
-      opacity: 0.9;
+      color: #542024;
     }
 
     .auth-branding .feature-item .icon {
-      font-size: 1.4rem;
+      width: 24px;
+      height: 24px;
       flex-shrink: 0;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .auth-form-wrapper {
@@ -99,6 +102,12 @@
       margin-bottom: var(--space-6);
       justify-content: center;
       text-decoration: none;
+    }
+
+    .auth-logo img {
+      width: 160px;
+      height: auto;
+      object-fit: contain;
     }
 
     .auth-tabs {
@@ -147,157 +156,155 @@
       gap: var(--space-2);
     }
 
-    .rol-card:hover {
-      border-color: var(--color-primary);
-    }
-
+    .rol-card:hover { border-color: var(--color-primary); }
     .rol-card.selected {
       border-color: var(--color-primary);
       background: var(--color-primary-light);
     }
 
     .rol-card__icon {
-      font-size: 2rem;
+      width: 34px;
+      height: 34px;
+      color: var(--color-primary);
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
-
-    .rol-card__label {
-      font-size: var(--text-sm);
-      font-weight: var(--weight-semibold);
-    }
-
-    .rol-card__sub {
-      font-size: var(--text-xs);
-      color: var(--color-text-muted);
-    }
+    .rol-card__label { font-size: var(--text-sm); font-weight: var(--weight-semibold); }
+    .rol-card__sub   { font-size: var(--text-xs); color: var(--color-text-muted); }
   </style>
 </head>
+<body class="auth-page">
 
-<body>
+<div class="auth-layout">
 
-  <div class="auth-layout">
-
-    <!-- BRANDING lateral (desktop) -->
-    <div class="auth-branding" aria-hidden="true">
-      <a href="index.html" class="auth-logo" style="justify-content:flex-start;">
-        <span>📍</span> Mova
-      </a>
-      <h2>Tu negocio local,<br>en el bolsillo de tus clientes</h2>
-      <p>Agenda de citas, inventario y vitrina digital sin comisiones absurdas.</p>
-      <div class="feature-list">
-        <div class="feature-item"><span class="icon">📍</span> Visibilidad por cercanía GPS</div>
-        <div class="feature-item"><span class="icon">🗓</span> Agenda blindada con anticipo</div>
-        <div class="feature-item"><span class="icon">🛒</span> Apartados y Click &amp; Collect</div>
-        <div class="feature-item"><span class="icon">💰</span> Control de tu inventario en tiempo real</div>
-      </div>
+  <!-- BRANDING lateral (desktop) -->
+  <div class="auth-branding" aria-hidden="true">
+    <a href="index.html" class="auth-logo" style="justify-content:flex-start;">
+      <img src="imagenes/logo-acceso.png" alt="Mova">
+    </a>
+    <h2>Tu negocio local,<br>en el bolsillo de tus clientes</h2>
+    <p>Agenda de citas, inventario y vitrina digital sin comisiones absurdas.</p>
+    <div class="feature-list">
+      <div class="feature-item"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Visibilidad por cercanía GPS</div>
+      <div class="feature-item"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18m-9 3v5m-2.5-2.5h5"/></svg> Agenda blindada con anticipo</div>
+      <div class="feature-item"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2 10h11l3-7H6"/><circle cx="9" cy="19" r="1"/><circle cx="18" cy="19" r="1"/></svg> Apartados y Click &amp; Collect</div>
+      <div class="feature-item"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4 8-4V7M12 11v10"/></svg> Control de tu inventario en tiempo real</div>
     </div>
-
-    <!-- FORMULARIO -->
-    <div class="auth-form-wrapper">
-      <div class="auth-card">
-        <a href="index.html" class="auth-logo">
-          <span>📍</span> Mova
-        </a>
-
-        <!-- Tabs Login / Registro -->
-        <div class="auth-tabs" role="tablist" aria-label="Modo de acceso">
-          <button class="auth-tab-btn active" role="tab" id="tab-login" aria-selected="true"
-            aria-controls="form-login">Iniciar sesión</button>
-          <button class="auth-tab-btn" role="tab" id="tab-registro" aria-selected="false"
-            aria-controls="form-registro">Crear cuenta</button>
-        </div>
-
-        <!-- ════ FORM LOGIN ════════════════════════════ -->
-        <form id="form-login" novalidate>
-          <div class="form-group">
-            <label class="form-label" for="login-email">Correo electrónico</label>
-            <input type="email" id="login-email" name="email" class="form-control" placeholder="tucorreo@ejemplo.mx"
-              autocomplete="email" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="login-password">Contraseña</label>
-            <input type="password" id="login-password" name="password" class="form-control" placeholder="Tu contraseña"
-              autocomplete="current-password" required>
-          </div>
-          <div id="login-error" class="alert alert--danger" style="display:none;"></div>
-          <button type="submit" class="btn btn--primary btn--full btn--lg" id="btn-login">
-            Iniciar sesión
-          </button>
-
-        </form>
-
-        <!-- ════ FORM REGISTRO ═════════════════════════ -->
-        <form id="form-registro" style="display:none;" novalidate>
-          <div class="form-group">
-            <label class="form-label" for="reg-nombre">Nombre completo <span class="required">*</span></label>
-            <input type="text" id="reg-nombre" name="nombre" class="form-control" placeholder="Tu nombre"
-              autocomplete="name" required minlength="2" maxlength="120">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-email">Correo electrónico <span class="required">*</span></label>
-            <input type="email" id="reg-email" name="email" class="form-control" placeholder="tucorreo@ejemplo.mx"
-              autocomplete="email" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-tel">Teléfono (opcional)</label>
-            <input type="tel" id="reg-tel" name="telefono" class="form-control" placeholder="55 1234 5678"
-              autocomplete="tel" maxlength="20">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-password">Contraseña <span class="required">*</span></label>
-            <input type="password" id="reg-password" name="password" class="form-control"
-              placeholder="Mín. 8 caracteres, 1 mayúscula, 1 número" autocomplete="new-password" required minlength="8">
-            <span class="form-hint">Mínimo 8 caracteres, una mayúscula y un número.</span>
-          </div>
-
-          <!-- Selector de rol -->
-          <div class="form-group">
-            <label class="form-label">¿Cómo vas a usar Mova? <span class="required">*</span></label>
-            <div class="rol-selector">
-              <div class="rol-card selected" data-rol="cliente" role="radio" aria-checked="true" tabindex="0">
-                <div class="rol-card__icon">👤</div>
-                <div class="rol-card__label">Cliente</div>
-                <div class="rol-card__sub">Busco y aparto productos o servicios</div>
-              </div>
-              <div class="rol-card" data-rol="negocio" role="radio" aria-checked="false" tabindex="0">
-                <div class="rol-card__icon">🏪</div>
-                <div class="rol-card__label">Negocio</div>
-                <div class="rol-card__sub">Tengo un negocio y quiero publicarlo</div>
-              </div>
-            </div>
-            <input type="hidden" id="reg-rol" name="rol" value="cliente">
-          </div>
-
-          <div id="registro-error" class="alert alert--danger" style="display:none;"></div>
-
-          <button type="submit" class="btn btn--primary btn--full btn--lg" id="btn-registro">
-            Crear mi cuenta
-          </button>
-
-          <p class="text-center text-xs text-muted" style="margin-top:var(--space-4);">
-            Al registrarte aceptas los Términos de Servicio y la Política de Privacidad.
-          </p>
-        </form>
-
-      </div>
-    </div>
-
   </div>
 
-  <script type="module">
-    import { api, ApiError, toast, btnLoading } from './js/api.js';
+  <!-- FORMULARIO -->
+  <div class="auth-form-wrapper">
+    <div class="auth-card">
+      <a href="index.html" class="auth-logo">
+        <img src="imagenes/logo-acceso.png" alt="Mova">
+      </a>
 
-    // ── Verificar si ya hay sesión ────────────────────────────────
-    const redirect = new URLSearchParams(window.location.search).get('redirect') ?? 'index.html';
+      <!-- Tabs Login / Registro -->
+      <div class="auth-tabs" role="tablist" aria-label="Modo de acceso">
+        <button class="auth-tab-btn active" role="tab" id="tab-login" aria-selected="true"
+                aria-controls="form-login">Iniciar sesión</button>
+        <button class="auth-tab-btn" role="tab" id="tab-registro" aria-selected="false"
+                aria-controls="form-registro">Crear cuenta</button>
+      </div>
 
-    (async () => {
-      try {
-        const me = await api.get('auth.php', { action: 'me' });
-        if (me.autenticado) {
-          const card = document.querySelector('.auth-card');
-          const aviso = document.createElement('div');
-          aviso.className = 'alert alert--info';
-          aviso.style.marginBottom = 'var(--space-5)';
-          aviso.innerHTML = `
+      <!-- ════ FORM LOGIN ════════════════════════════ -->
+      <form id="form-login" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="login-email">Correo electrónico</label>
+          <input type="email" id="login-email" name="email" class="form-control"
+                 placeholder="tucorreo@ejemplo.mx" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Contraseña</label>
+          <input type="password" id="login-password" name="password" class="form-control"
+                 placeholder="Tu contraseña" autocomplete="current-password" required>
+        </div>
+        <div id="login-error" class="alert alert--danger" style="display:none;"></div>
+        <button type="submit" class="btn btn--primary btn--full btn--lg" id="btn-login">
+          Iniciar sesión
+        </button>
+        <p class="text-center text-sm text-muted" style="margin-top:var(--space-4);">
+          <strong>Demo:</strong> ana@cliente.mx / Demo1234!
+        </p>
+      </form>
+
+      <!-- ════ FORM REGISTRO ═════════════════════════ -->
+      <form id="form-registro" style="display:none;" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="reg-nombre">Nombre completo <span class="required">*</span></label>
+          <input type="text" id="reg-nombre" name="nombre" class="form-control"
+                 placeholder="Tu nombre" autocomplete="name" required minlength="2" maxlength="120">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-email">Correo electrónico <span class="required">*</span></label>
+          <input type="email" id="reg-email" name="email" class="form-control"
+                 placeholder="tucorreo@ejemplo.mx" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-tel">Teléfono (opcional)</label>
+          <input type="tel" id="reg-tel" name="telefono" class="form-control"
+                 placeholder="55 1234 5678" autocomplete="tel" maxlength="20">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-password">Contraseña <span class="required">*</span></label>
+          <input type="password" id="reg-password" name="password" class="form-control"
+                 placeholder="Mín. 8 caracteres, 1 mayúscula, 1 número" autocomplete="new-password"
+                 required minlength="8">
+          <span class="form-hint">Mínimo 8 caracteres, una mayúscula y un número.</span>
+        </div>
+
+        <!-- Selector de rol -->
+        <div class="form-group">
+          <label class="form-label">¿Cómo vas a usar Mova? <span class="required">*</span></label>
+          <div class="rol-selector">
+            <div class="rol-card selected" data-rol="cliente" role="radio" aria-checked="true" tabindex="0">
+              <svg class="rol-card__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5v2"/></svg>
+              <div class="rol-card__label">Cliente</div>
+              <div class="rol-card__sub">Busco y aparto productos o servicios</div>
+            </div>
+            <div class="rol-card" data-rol="negocio" role="radio" aria-checked="false" tabindex="0">
+              <svg class="rol-card__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v10h16V10M3 10l2-6h14l2 6a3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1-6 0 3 3 0 0 1-3 3 3 3 0 0 1-3-3ZM9 20v-5h6v5"/></svg>
+              <div class="rol-card__label">Negocio</div>
+              <div class="rol-card__sub">Tengo un negocio y quiero publicarlo</div>
+            </div>
+          </div>
+          <input type="hidden" id="reg-rol" name="rol" value="cliente">
+        </div>
+
+        <div id="registro-error" class="alert alert--danger" style="display:none;"></div>
+
+        <button type="submit" class="btn btn--primary btn--full btn--lg" id="btn-registro">
+          Crear mi cuenta
+        </button>
+
+        <p class="text-center text-xs text-muted" style="margin-top:var(--space-4);">
+          Al registrarte aceptas los Términos de Servicio y la Política de Privacidad.
+        </p>
+      </form>
+
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { api, ApiError, toast, btnLoading } from './js/api.js';
+
+  // ── Verificar si ya hay sesión ────────────────────────────────
+  const redirect = new URLSearchParams(window.location.search).get('redirect') ?? 'index.html';
+
+  (async () => {
+    try {
+      const me = await api.get('auth.php', { action: 'me' });
+      if (me.autenticado) {
+        const card = document.querySelector('.auth-card');
+        const aviso = document.createElement('div');
+        aviso.className = 'alert alert--info';
+        aviso.style.marginBottom = 'var(--space-5)';
+        aviso.innerHTML = `
           <div style="width:100%;">
             <p style="margin-bottom:var(--space-2);">Ya has iniciado sesión como <strong>${me.usuario.nombre}</strong> (<em>${me.usuario.rol}</em>).</p>
             <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-3);">
@@ -306,124 +313,123 @@
             </div>
           </div>
         `;
-          card.insertBefore(aviso, card.querySelector('.auth-tabs'));
+        card.insertBefore(aviso, card.querySelector('.auth-tabs'));
 
-          document.getElementById('btn-cerrar-sesion-login')?.addEventListener('click', async () => {
-            try {
-              await api.post('auth.php', { action: 'logout' });
-            } catch { }
-            aviso.remove();
-            toast('Sesión cerrada correctamente.', 'success');
-          });
-        }
-      } catch { /* Sin sesión previa */ }
-    })();
+        document.getElementById('btn-cerrar-sesion-login')?.addEventListener('click', async () => {
+          try {
+            await api.post('auth.php', { action: 'logout' });
+          } catch {}
+          aviso.remove();
+          toast('Sesión cerrada correctamente.', 'success');
+        });
+      }
+    } catch { /* Sin sesión previa */ }
+  })();
 
-    function _redirigirPorRol(rol) {
-      window.location.href = rol === 'negocio' ? 'panel-negocio.html' : redirect;
+  function _redirigirPorRol(rol) {
+    window.location.href = rol === 'negocio' ? 'panel-negocio.html' : redirect;
+  }
+
+  // ── Tabs ──────────────────────────────────────────────────────
+  const tabLogin    = document.getElementById('tab-login');
+  const tabRegistro = document.getElementById('tab-registro');
+  const formLogin   = document.getElementById('form-login');
+  const formReg     = document.getElementById('form-registro');
+
+  tabLogin.addEventListener('click', () => {
+    tabLogin.classList.add('active');    tabLogin.setAttribute('aria-selected', 'true');
+    tabRegistro.classList.remove('active'); tabRegistro.setAttribute('aria-selected', 'false');
+    formLogin.style.display = 'block';
+    formReg.style.display   = 'none';
+  });
+
+  tabRegistro.addEventListener('click', () => {
+    tabRegistro.classList.add('active'); tabRegistro.setAttribute('aria-selected', 'true');
+    tabLogin.classList.remove('active'); tabLogin.setAttribute('aria-selected', 'false');
+    formReg.style.display   = 'block';
+    formLogin.style.display = 'none';
+  });
+
+  // ── Selector de rol ───────────────────────────────────────────
+  const rolCards = document.querySelectorAll('.rol-card[data-rol]');
+  const rolInput = document.getElementById('reg-rol');
+
+  rolCards.forEach(card => {
+    const seleccionar = () => {
+      rolCards.forEach(c => { c.classList.remove('selected'); c.setAttribute('aria-checked', 'false'); });
+      card.classList.add('selected');
+      card.setAttribute('aria-checked', 'true');
+      rolInput.value = card.dataset.rol;
+    };
+    card.addEventListener('click', seleccionar);
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') seleccionar(); });
+  });
+
+  // ── Formulario Login ──────────────────────────────────────────
+  formLogin.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn   = document.getElementById('btn-login');
+    const errEl = document.getElementById('login-error');
+    const datos = Object.fromEntries(new FormData(formLogin));
+
+    if (!datos.email || !datos.password) {
+      errEl.textContent   = 'Ingresa tu correo y contraseña.';
+      errEl.style.display = 'flex';
+      return;
     }
 
-    // ── Tabs ──────────────────────────────────────────────────────
-    const tabLogin = document.getElementById('tab-login');
-    const tabRegistro = document.getElementById('tab-registro');
-    const formLogin = document.getElementById('form-login');
-    const formReg = document.getElementById('form-registro');
+    errEl.style.display = 'none';
+    btnLoading(btn, true);
 
-    tabLogin.addEventListener('click', () => {
-      tabLogin.classList.add('active'); tabLogin.setAttribute('aria-selected', 'true');
-      tabRegistro.classList.remove('active'); tabRegistro.setAttribute('aria-selected', 'false');
-      formLogin.style.display = 'block';
-      formReg.style.display = 'none';
-    });
+    try {
+      const res = await api.post('auth.php', { action: 'login' }, datos);
+      toast(`¡Bienvenido, ${res.usuario.nombre.split(' ')[0]}!`, 'success');
+      _redirigirPorRol(res.usuario.rol);
+    } catch (err) {
+      errEl.textContent   = err.message;
+      errEl.style.display = 'flex';
+      btnLoading(btn, false);
+    }
+  });
 
-    tabRegistro.addEventListener('click', () => {
-      tabRegistro.classList.add('active'); tabRegistro.setAttribute('aria-selected', 'true');
-      tabLogin.classList.remove('active'); tabLogin.setAttribute('aria-selected', 'false');
-      formReg.style.display = 'block';
-      formLogin.style.display = 'none';
-    });
+  // ── Formulario Registro ───────────────────────────────────────
+  formReg.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn   = document.getElementById('btn-registro');
+    const errEl = document.getElementById('registro-error');
+    const datos = Object.fromEntries(new FormData(formReg));
 
-    // ── Selector de rol ───────────────────────────────────────────
-    const rolCards = document.querySelectorAll('.rol-card[data-rol]');
-    const rolInput = document.getElementById('reg-rol');
+    // Validación básica client-side (el server valida de nuevo)
+    if (!datos.nombre?.trim() || !datos.email || !datos.password) {
+      errEl.textContent   = 'Nombre, correo y contraseña son obligatorios.';
+      errEl.style.display = 'flex';
+      return;
+    }
 
-    rolCards.forEach(card => {
-      const seleccionar = () => {
-        rolCards.forEach(c => { c.classList.remove('selected'); c.setAttribute('aria-checked', 'false'); });
-        card.classList.add('selected');
-        card.setAttribute('aria-checked', 'true');
-        rolInput.value = card.dataset.rol;
-      };
-      card.addEventListener('click', seleccionar);
-      card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') seleccionar(); });
-    });
+    if (datos.password.length < 8) {
+      errEl.textContent   = 'La contraseña debe tener al menos 8 caracteres.';
+      errEl.style.display = 'flex';
+      return;
+    }
 
-    // ── Formulario Login ──────────────────────────────────────────
-    formLogin.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('btn-login');
-      const errEl = document.getElementById('login-error');
-      const datos = Object.fromEntries(new FormData(formLogin));
+    errEl.style.display = 'none';
+    btnLoading(btn, true);
 
-      if (!datos.email || !datos.password) {
-        errEl.textContent = 'Ingresa tu correo y contraseña.';
-        errEl.style.display = 'flex';
-        return;
-      }
-
-      errEl.style.display = 'none';
-      btnLoading(btn, true);
-
-      try {
-        const res = await api.post('auth.php', { action: 'login' }, datos);
-        toast(`¡Bienvenido, ${res.usuario.nombre.split(' ')[0]}!`, 'success');
-        _redirigirPorRol(res.usuario.rol);
-      } catch (err) {
-        errEl.textContent = err.message;
-        errEl.style.display = 'flex';
-        btnLoading(btn, false);
-      }
-    });
-
-    // ── Formulario Registro ───────────────────────────────────────
-    formReg.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('btn-registro');
-      const errEl = document.getElementById('registro-error');
-      const datos = Object.fromEntries(new FormData(formReg));
-
-      // Validación básica client-side (el server valida de nuevo)
-      if (!datos.nombre?.trim() || !datos.email || !datos.password) {
-        errEl.textContent = 'Nombre, correo y contraseña son obligatorios.';
-        errEl.style.display = 'flex';
-        return;
-      }
-
-      if (datos.password.length < 8) {
-        errEl.textContent = 'La contraseña debe tener al menos 8 caracteres.';
-        errEl.style.display = 'flex';
-        return;
-      }
-
-      errEl.style.display = 'none';
-      btnLoading(btn, true);
-
-      try {
-        const res = await api.post('auth.php', { action: 'register' }, datos);
-        toast(`¡Cuenta creada! Bienvenido a Mova, ${res.usuario.nombre.split(' ')[0]}.`, 'success', 4000);
-        _redirigirPorRol(res.usuario.rol);
-      } catch (err) {
-        // El endpoint puede devolver array de errores
-        const msg = err.data?.errores
-          ? err.data.errores.join(' | ')
-          : err.message;
-        errEl.textContent = msg;
-        errEl.style.display = 'flex';
-        btnLoading(btn, false);
-      }
-    });
-  </script>
+    try {
+      const res = await api.post('auth.php', { action: 'register' }, datos);
+      toast(`¡Cuenta creada! Bienvenido a Mova, ${res.usuario.nombre.split(' ')[0]}.`, 'success', 4000);
+      _redirigirPorRol(res.usuario.rol);
+    } catch (err) {
+      // El endpoint puede devolver array de errores
+      const msg = err.data?.errores
+        ? err.data.errores.join(' | ')
+        : err.message;
+      errEl.textContent   = msg;
+      errEl.style.display = 'flex';
+      btnLoading(btn, false);
+    }
+  });
+</script>
 
 </body>
-
 </html>

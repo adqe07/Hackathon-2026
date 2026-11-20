@@ -3,200 +3,218 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Encuentra negocios locales cercanos a ti: estéticas, barberías, perfumerías, bazares y más.">
-  <title>Mova — Comercio y Servicios Cercanos</title>
-  <link rel="stylesheet" href="css/variables.css">
+  <meta name="description" content="Explora servicios y negocios cerca de ti con Mova.">
+  <title>Mova | Servicios y negocios cerca de ti</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&amp;display=swap">
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/componentes.css">
-  <style>
-    /* Estilos específicos del hero de la landing */
-    .hero {
-      background: linear-gradient(135deg, var(--hero-gradient-start, var(--color-primary)) 0%, var(--hero-gradient-end, #9C6FFF) 100%);
-      color: #fff;
-      padding: var(--space-10) 0 var(--space-16);
-      text-align: center;
-    }
-    .hero h1 { color: #fff; font-size: clamp(1.8rem, 5vw, 3rem); margin-bottom: var(--space-4); }
-    .hero p  { font-size: var(--text-lg); opacity: 0.9; max-width: 500px; margin: 0 auto var(--space-8); }
-    .hero .search-bar { max-width: 560px; margin: 0 auto; }
-    .resultados-section { padding: var(--space-6) 0 var(--space-10); }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.5; }
-    }
-  </style>
+  <link rel="stylesheet" href="css/variables.css?v=paleta-2">
+  <link rel="stylesheet" href="css/inicio.css?v=tarjetas-originales">
 </head>
-<body>
-
-<!-- ══ HEADER ══════════════════════════════════════════════════════ -->
-<header class="site-header">
-  <div class="container">
-    <a href="index.html" class="logo">
-      <span class="logo__icon">📍</span>
-      Mova
-    </a>
-    <nav class="header-nav" aria-label="Navegación principal">
-      <div id="nav-auth">
-        <!-- Se inyecta dinámicamente desde JS -->
-        <a href="login.html" class="btn btn--secondary btn--sm">Entrar</a>
-      </div>
-    </nav>
-  </div>
-</header>
-
-<!-- ══ HERO + BUSCADOR ═════════════════════════════════════════════ -->
-<section class="hero">
-  <div class="container">
-    <h1>Negocios locales,<br>a pasos de ti</h1>
-    <p>Estéticas, perfumerías, bazares, talleres y más. Aparta, agenda y paga sin moverte.</p>
-
-    <div class="search-bar">
-      <span class="search-bar__icon" aria-hidden="true">🔍</span>
-      <input
-        type="search"
-        id="search-input"
-        class="search-bar__input"
-        placeholder="Busca un negocio, producto o servicio…"
-        aria-label="Buscar negocios"
-        autocomplete="off"
-      >
-      <button id="search-btn" class="search-bar__btn" aria-label="Buscar">Buscar</button>
-    </div>
-
-    <div class="geo-demo-row">
-      <button id="btn-ubicacion" class="btn btn--ghost btn--sm">
-        📍 Usar mi ubicación
-      </button>
-      <button id="btn-ubicacion-demo" class="btn btn--ghost btn--sm">
-        Usar ubicación demo (Roma Norte, CDMX)
-      </button>
-    </div>
-  </div>
-</section>
-
-<!-- ══ FILTROS DE CATEGORÍA ════════════════════════════════════════ -->
-<div style="background:var(--color-surface);border-bottom:1px solid var(--color-border);padding:var(--space-3) 0;position:sticky;top:var(--header-height);z-index:50;">
-  <div class="container">
-    <div class="categoria-chips" id="categoria-chips" role="list" aria-label="Filtrar por categoría">
-      <button class="chip" data-categoria="estetica" role="listitem">💇 Estética</button>
-      <button class="chip" data-categoria="barberia" role="listitem">✂️ Barbería</button>
-      <button class="chip" data-categoria="perfumeria" role="listitem">🌸 Perfumería</button>
-      <button class="chip" data-categoria="bazar" role="listitem">🛍️ Bazar</button>
-      <button class="chip" data-categoria="boutique" role="listitem">🧥 Boutique</button>
-      <button class="chip" data-categoria="taller" role="listitem">🔧 Taller</button>
-      <button class="chip" data-categoria="tecnico" role="listitem">💻 Servicio técnico</button>
-      <button class="chip" data-categoria="ropa" role="listitem">👗 Ropa</button>
-      <button class="chip" data-categoria="joyeria" role="listitem">💍 Joyería</button>
-      <button class="chip" data-categoria="comercio" role="listitem">✏️ Comercio local</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ MAPA PROPIO MOVA ════════════════════════════════════════════ -->
-<section class="mapa-seccion" aria-labelledby="mapa-inicio-titulo">
-  <div class="container">
-    <div class="mapa-seccion__encabezado">
-      <div><h2 id="mapa-inicio-titulo">Negocios cerca de ti</h2><p class="text-sm text-muted">Mapa interactivo con calles y coordenadas reales. Arrastra, cambia el zoom o selecciona un marcador.</p></div>
-      <span id="mapa-inicio-resumen" class="text-sm text-muted" aria-live="polite"></span>
-    </div>
-    <div id="mova-map-inicio" class="mapa-mova" aria-busy="true"></div>
-  </div>
-</section>
-
-<!-- ══ RESULTADOS ══════════════════════════════════════════════════ -->
-<main class="main-content">
-  <section class="resultados-section">
+<body class="inicio">
+  <header class="site-header">
     <div class="container">
-      <div class="flex items-center justify-between mb-4" style="flex-wrap:wrap;gap:var(--space-3);">
+      <a href="index.html" class="logo" aria-label="Mova, inicio">
+        <img src="imagenes/logo.png" width="100" height="40" alt="Mova">
+      </a>
+      <nav class="inicio-nav" aria-label="Navegación principal">
+        <a href="index.html" aria-current="page">Inicio</a>
+        <a href="#categorias">Categorías</a>
+        <a href="#cerca-de-ti">Cerca de ti</a>
+      </nav>
+      <nav class="header-nav" aria-label="Cuenta" id="nav-auth">
+        <a href="login.html" class="btn btn--secondary btn--sm">Entrar</a>
+      </nav>
+      <div class="location-selector">
+        <button type="button" class="location-trigger" id="location-trigger"
+                aria-expanded="false" aria-controls="location-menu">
+          <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z M12 7a3 3 0 1 0 0 6 3 3 0 1 0 0-6Z"/></svg>
+          <span class="location-info">
+            <span class="location-label">Tu ubicación</span>
+            <span id="location-value" class="location-value" aria-live="polite">Elegir ubicación</span>
+          </span>
+          <svg class="location-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="location-menu" id="location-menu" hidden>
+          <button type="button" id="btn-ubicacion">Usar mi ubicación</button>
+          <button type="button" id="btn-ubicacion-demo">Usar ubicación demo (Roma Norte, CDMX)</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content container">
+    <section class="hero" aria-labelledby="titulo-inicio">
+      <div class="hero__copy">
+        <h1 id="titulo-inicio">Encuentra servicios y productos cerca de ti</h1>
+        <p>Explora negocios locales y agenda en línea.</p>
+        <div class="search-bar" id="buscar" role="search">
+          <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 3a7.5 7.5 0 1 0 0 15 7.5 7.5 0 1 0 0-15Z M16 16l5 5"/></svg>
+          <input type="search" id="search-input" class="search-bar__input"
+                 placeholder="¿Qué estás buscando?" aria-label="Buscar un negocio, producto o servicio">
+          <button type="button" id="search-btn" class="search-bar__btn">Buscar</button>
+        </div>
+      </div>
+      <div class="hero__visual" aria-hidden="true"></div>
+    </section>
+
+    <section class="categorias" id="categorias" aria-labelledby="titulo-categorias">
+      <div class="categorias__header">
+        <h2 id="titulo-categorias">Explora por categoría</h2>
+        <div class="categorias__controles">
+          <button type="button" id="categorias-anterior" aria-label="Categorías anteriores" aria-controls="categorias-carrusel" disabled>‹</button>
+          <button type="button" id="categorias-siguiente" aria-label="Categorías siguientes" aria-controls="categorias-carrusel">›</button>
+        </div>
+      </div>
+      <div id="categoria-chips">
+        <div class="categorias__carrusel" id="categorias-carrusel">
+          <button type="button" class="chip categoria-tile" data-categoria="perfumeria" aria-pressed="false">
+            <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6v4H9zM10 7v3m4-3v3M8 10h8a3 3 0 0 1 3 3v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-6a3 3 0 0 1 3-3Zm2 5h4m-4 3h4"/></svg><span>Perfumería</span>
+          </button>
+          <button type="button" class="chip categoria-tile" data-categoria="salud" aria-pressed="false">
+            <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6Z"/></svg><span>Salud</span>
+          </button>
+          <button type="button" class="chip categoria-tile" data-categoria="tecnico" aria-pressed="false">
+            <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16V5h18v11 M3 16h18l2 4H1Z M10 18h4"/></svg><span>Tecnología</span>
+          </button>
+          <button type="button" class="chip categoria-tile" data-categoria="taller" aria-pressed="false">
+            <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16v-5l3-6h12l3 6v5Z M3 11h18 M4 16v3h3v-3m10 0v3h3v-3 M6 13h2m8 0h2"/></svg><span>Servicio automotriz</span>
+          </button>
+          <button type="button" class="chip categoria-tile" data-categoria="mascotas" aria-pressed="false">
+            <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 13c-4-1-5-6-2-6 2 0 3 3 2 6Zm12 0c4-1 5-6 2-6-2 0-3 3-2 6ZM9 10c-3-1-3-7 0-7s3 6 0 7Zm6 0c-3-1-3-7 0-7s3 6 0 7ZM5 19c0-2 4-7 7-7s7 5 7 7c0 4-5 1-7 1s-7 3-7-1Z"/></svg><span>Mascotas</span>
+          </button>
+          <button type="button" class="chip categoria-tile" data-categoria="estetica-barberia" aria-pressed="false">
+            <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 14a3 3 0 1 0 0 6 3 3 0 1 0 0-6Zm12 0a3 3 0 1 0 0 6 3 3 0 1 0 0-6ZM8 15 20 3M16 15 4 3"/></svg><span>Estéticas y Barberías</span>
+          </button>
+          <button type="button" class="chip categoria-tile" data-categoria="hogar" aria-pressed="false">
+            <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 11 10-8 10 8 M5 10v11h5v-6h4v6h5V10"/></svg><span>Servicios para el hogar</span>
+          </button>
+          <button type="button" class="chip categoria-tile" data-categoria="joyeria" aria-pressed="false">
+            <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="15" r="6"/><path d="m8 5 2-3h4l2 3-4 4-4-4Zm0 0h8"/></svg><span>Joyería</span>
+          </button>
+          <button type="button" class="chip categoria-tile" data-categoria="belleza-boutique" aria-pressed="false">
+            <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c0 6 4 10 10 10-6 0-10 4-10 10 0-6-4-10-10-10 6 0 10-4 10-10Z M20 3v4m-2-2h4"/></svg><span>Belleza y Boutique</span>
+          </button>
+          <button type="button" class="chip categoria-tile" data-categoria="entretenimiento" aria-pressed="false">
+            <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 3 4 4 4-4M4 8h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z"/></svg><span>Entretenimiento</span>
+          </button>
+          <button type="button" class="chip categoria-tile" data-categoria="limpieza" aria-pressed="false">
+            <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c3 5 7 9 7 13a7 7 0 0 1-14 0c0-4 4-8 7-13Zm-4 13a4 4 0 0 0 4 4 M21 5v4m-2-2h4"/></svg><span>Servicio de limpieza</span>
+          </button>
+          <button type="button" class="chip categoria-tile" data-categoria="ropa-bazar" aria-pressed="false">
+            <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 3-6 4 3 5 3-2v11h8V10l3 2 3-5-6-4c0 3-8 3-8 0Z"/></svg><span>Ropa y Bazar</span>
+          </button>
+          <button type="button" class="chip categoria-tile" data-categoria="comercio" aria-pressed="false">
+            <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v10h16V10M3 10l2-6h14l2 6a3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1-6 0 3 3 0 0 1-3 3 3 3 0 0 1-3-3ZM9 20v-5h6v5"/></svg><span>Comercio local</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="resultados-section" id="cerca-de-ti" aria-labelledby="titulo-resultados">
+      <div class="resultados__header">
+        <h2 id="titulo-resultados"><svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z M12 7a3 3 0 1 0 0 6 3 3 0 1 0 0-6Z"/></svg> Cerca de ti</h2>
         <p id="result-count" class="text-sm text-muted" aria-live="polite"></p>
       </div>
+      <div class="grid grid--auto" id="negocios-grid" aria-live="polite" aria-label="Lista de negocios"></div>
+      <button type="button" id="btn-ver-mas" class="btn btn--secondary" style="display:none">Ver más negocios</button>
+    </section>
+  </main>
 
-      <div class="grid grid--auto" id="negocios-grid" aria-live="polite" aria-label="Lista de negocios">
-        <!-- Se llena dinámicamente -->
-      </div>
+  <nav class="bottom-nav" aria-label="Navegación móvil">
+    <a href="index.html" class="bottom-nav__item active" aria-current="page">
+      <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 11 10-8 10 8 M5 10v11h5v-6h4v6h5V10"/></svg><span>Inicio</span>
+    </a>
+    <a href="#buscar" class="bottom-nav__item">
+      <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 3a7.5 7.5 0 1 0 0 15 7.5 7.5 0 1 0 0-15Z M16 16l5 5"/></svg><span>Buscar</span>
+    </a>
+    <a href="login.html?redirect=mis-citas.html" class="bottom-nav__item" id="nav-mis-citas">
+      <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z M7 3v4m10-4v4M3 10h18"/></svg><span>Agenda</span>
+    </a>
+    <a href="login.html" class="bottom-nav__item" id="nav-perfil">
+      <svg class="inicio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8Z M4 21v-2a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5v2"/></svg><span>Perfil</span>
+    </a>
+  </nav>
 
-      <div style="text-align:center;margin-top:var(--space-8);">
-        <button id="btn-ver-mas" class="btn btn--secondary" style="display:none;">
-          Ver más negocios
-        </button>
-      </div>
-    </div>
-  </section>
-</main>
+  <script type="module">
+    import { initBuscador } from './js/buscador.js?v=portadas-1';
+    import { api } from './js/api.js';
 
-<!-- ══ NAV INFERIOR (mobile) ═══════════════════════════════════════ -->
-<nav class="bottom-nav" aria-label="Navegación móvil">
-  <a href="index.html" class="bottom-nav__item active">
-    <span class="icon" aria-hidden="true">🏠</span>
-    <span>Inicio</span>
-  </a>
-  <a href="index.html#buscar" class="bottom-nav__item">
-    <span class="icon" aria-hidden="true">🔍</span>
-    <span>Buscar</span>
-  </a>
-  <a href="login.html" class="bottom-nav__item" id="nav-mis-citas">
-    <span class="icon" aria-hidden="true">🗓</span>
-    <span>Mis Citas</span>
-  </a>
-  <a href="login.html" class="bottom-nav__item" id="nav-perfil">
-    <span class="icon" aria-hidden="true">👤</span>
-    <span>Perfil</span>
-  </a>
-</nav>
+    initBuscador();
 
-<!-- ══ SCRIPTS ════════════════════════════════════════════════════ -->
-<script type="module">
-  import { initBuscador } from './js/buscador.js';
-  import { api, toast }   from './js/api.js';
+    const carrusel = document.getElementById('categorias-carrusel');
+    const anterior = document.getElementById('categorias-anterior');
+    const siguiente = document.getElementById('categorias-siguiente');
 
-  // ── Inicializar buscador ──────────────────────────────────────
-  initBuscador();
+    function actualizarFlechas() {
+      anterior.disabled = carrusel.scrollLeft <= 1;
+      siguiente.disabled = carrusel.scrollLeft + carrusel.clientWidth >= carrusel.scrollWidth - 1;
+    }
 
-  // ── Verificar sesión para personalizar nav ────────────────────
-  (async () => {
-    try {
-      const me = await api.get('auth.php', { action: 'me' });
-      if (me.autenticado) {
-        const navAuth = document.getElementById('nav-auth');
-        navAuth.innerHTML = `
-          <div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;">
-            <span class="text-sm text-muted">Hola, <strong>${me.usuario.nombre.split(' ')[0]}</strong></span>
-            ${me.usuario.rol === 'negocio'
-              ? `<a href="panel-negocio.html" class="btn btn--primary btn--sm">🏪 Mi panel</a>`
-              : `<a href="mis-citas.html" class="btn btn--primary btn--sm">Mis Citas y Apartados</a>`}
-            <button id="btn-logout" class="btn btn--ghost btn--sm">Cerrar sesión</button>
-          </div>`;
+    anterior.addEventListener('click', () => carrusel.scrollBy({ left: -carrusel.clientWidth }));
+    siguiente.addEventListener('click', () => carrusel.scrollBy({ left: carrusel.clientWidth }));
+    carrusel.addEventListener('scroll', actualizarFlechas, { passive: true });
+    new ResizeObserver(actualizarFlechas).observe(carrusel);
 
-        document.getElementById('btn-logout')?.addEventListener('click', async (e) => {
-          e.preventDefault();
-          try {
-            await api.post('auth.php', { action: 'logout' });
-          } catch {}
-          window.location.href = 'login.html';
+    const locationTrigger = document.getElementById('location-trigger');
+    const locationMenu = document.getElementById('location-menu');
+
+    function mostrarMenuUbicacion(abierto, devolverFoco = false) {
+      locationMenu.hidden = !abierto;
+      locationTrigger.setAttribute('aria-expanded', String(abierto));
+      if (devolverFoco) locationTrigger.focus();
+    }
+
+    locationTrigger.addEventListener('click', () => mostrarMenuUbicacion(locationMenu.hidden));
+    locationMenu.addEventListener('click', (event) => {
+      if (event.target.closest('button')) mostrarMenuUbicacion(false, true);
+    });
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('.location-selector')) mostrarMenuUbicacion(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !locationMenu.hidden) mostrarMenuUbicacion(false, true);
+    });
+
+    async function cerrarSesion() {
+      try {
+        await api.post('auth.php', { action: 'logout' });
+      } catch {}
+      window.location.href = 'login.html';
+    }
+
+    async function actualizarNavegacion() {
+      try {
+        const me = await api.get('auth.php', { action: 'me' });
+        if (!me.autenticado) return;
+
+        const esNegocio = me.usuario.rol === 'negocio';
+        const citas = document.getElementById('nav-mis-citas');
+        citas.href = esNegocio ? 'panel-negocio.html' : 'mis-citas.html';
+        citas.querySelector('span').textContent = esNegocio ? 'Mi panel' : 'Agenda';
+
+        const cuenta = document.getElementById('nav-auth');
+        cuenta.innerHTML = `
+          <a class="btn btn--secondary btn--sm"></a>
+          <button type="button" class="btn btn--ghost btn--sm">Cerrar sesión</button>
+        `;
+        const enlace = cuenta.querySelector('a');
+        enlace.href = citas.href;
+        enlace.textContent = citas.querySelector('span').textContent;
+        cuenta.querySelector('button').addEventListener('click', cerrarSesion);
+
+        const perfil = document.getElementById('nav-perfil');
+        perfil.href = '#';
+        perfil.addEventListener('click', (event) => {
+          event.preventDefault();
+          if (confirm(`¿Cerrar sesión de ${me.usuario.nombre}?`)) cerrarSesion();
         });
+      } catch {}
+    }
 
-        // Actualizar nav mobile
-        if (me.usuario.rol === 'negocio') {
-          document.getElementById('nav-mis-citas').href = 'panel-negocio.html';
-          document.getElementById('nav-mis-citas').querySelector('span:first-child').textContent = '🏪';
-          document.getElementById('nav-mis-citas').querySelector('span:last-child').textContent  = 'Mi Panel';
-        }
-        if (me.usuario.rol === 'cliente') {
-          document.getElementById('nav-mis-citas').href = 'mis-citas.html';
-        }
-        const navPerfil = document.getElementById('nav-perfil');
-        navPerfil.href = '#';
-        navPerfil.addEventListener('click', async (e) => {
-          e.preventDefault();
-          if (confirm(`¿Cerrar sesión de ${me.usuario.nombre}?`)) {
-            try { await api.post('auth.php', { action: 'logout' }); } catch {}
-            window.location.href = 'login.html';
-          }
-        });
-      }
-    } catch { /* Sin sesión, mostramos botón de Entrar */ }
-  })();
-</script>
-
+    actualizarNavegacion();
+  </script>
 </body>
 </html>

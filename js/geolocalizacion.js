@@ -30,10 +30,10 @@ export class Geolocalizacion {
    * Intenta obtener la posición GPS del navegador.
    * Si no está disponible o el usuario deniega, ofrece fallback.
    *
-   * @param {{ forcePrompt?: boolean }} [opciones]
+   * @param {{ forcePrompt?: boolean, solicitarPermiso?: boolean }} [opciones]
    * @returns {Promise<{ lat: number, lon: number, source: string }>}
    */
-  async obtenerPosicion({ forcePrompt = false } = {}) {
+  async obtenerPosicion({ forcePrompt = false, solicitarPermiso = true } = {}) {
     // 1. Usar posición ya cargada en esta instancia
     if (this._posicion && !forcePrompt) {
       return this._posicion;
@@ -47,6 +47,8 @@ export class Geolocalizacion {
         return guardada;
       }
     }
+
+    if (!solicitarPermiso) return COORDS_DEFAULT;
 
     // 3. Intentar GPS del navegador
     if ('geolocation' in navigator) {

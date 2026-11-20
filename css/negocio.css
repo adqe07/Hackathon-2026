@@ -1,0 +1,177 @@
+body.perfil-negocio {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --color-bg: var(--color-mova-fondo);
+  --color-surface: var(--color-mova-superficie);
+  --color-text: var(--color-mova-texto);
+  --color-text-muted: var(--color-mova-texto-suave);
+  --color-surface-alt: var(--color-primary-light);
+  --color-border: var(--color-primary-light);
+  color-scheme: light;
+}
+
+.perfil-negocio .container { max-width: 1180px; padding-inline: 24px; }
+.perfil-negocio .site-header { background: var(--color-surface); box-shadow: none; }
+.perfil-negocio .logo img { width: 94px; height: 38px; object-fit: contain; }
+.perfil-negocio .header-nav { margin-left: auto; }
+.perfil-contenido { padding-top: 28px; }
+
+.perfil-presentacion {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 36px;
+  margin-bottom: 34px;
+  align-items: center;
+}
+
+.negocio-cover {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 72px;
+  font-weight: 600;
+}
+
+.negocio-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.perfil-galeria { display: flex; gap: 10px; overflow-x: auto; padding: 10px 2px 2px; }
+.perfil-galeria button { flex: 0 0 70px; height: 50px; border-radius: 8px; border: 2px solid transparent; padding: 0; overflow: hidden; background: var(--color-primary-light); cursor: pointer; }
+.perfil-galeria button[aria-pressed="true"] { border-color: var(--color-primary); }
+.perfil-galeria img { width: 100%; height: 100%; object-fit: cover; }
+.perfil-categoria { font-size: 13px; color: var(--color-primary); font-weight: 600; text-transform: capitalize; margin-bottom: 10px; }
+.perfil-titulo { display: flex; align-items: baseline; gap: 10px; }
+.perfil-titulo h1 { font-size: clamp(28px, 3vw, 42px); line-height: 1.12; letter-spacing: -.035em; margin: 0; overflow-wrap: anywhere; }
+.perfil-descripcion { margin: 16px 0; line-height: 1.7; color: var(--color-text-muted); }
+.perfil-datos { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--color-text-muted); margin-bottom: 22px; }
+.perfil-resumen .btn { border-radius: 12px; }
+
+.perfil-distribucion { display: grid; grid-template-columns: 310px minmax(0, 1fr); gap: 32px; align-items: start; }
+.perfil-informacion { display: grid; gap: 14px; }
+.perfil-panel { padding: 22px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 14px; }
+.perfil-panel h2 { font-size: 16px; margin: 0 0 12px; }
+.perfil-panel p { color: var(--color-text-muted); font-size: 13px; line-height: 1.7; }
+.perfil-panel a { font-size: 13px; }
+.perfil-contacto { display: grid; gap: 14px; }
+.perfil-contacto .btn { white-space: normal; }
+#negocio-mapa { width: 100%; height: 170px; border: 0; border-radius: 10px; margin: 2px 0 12px; background: var(--color-primary-light); }
+.perfil-catalogo { min-width: 0; scroll-margin-top: 90px; }
+.perfil-catalogo__titulo h2 { font-size: 25px; margin: 0 0 8px; letter-spacing: -.02em; }
+.perfil-catalogo__titulo p { color: var(--color-text-muted); font-size: 14px; margin-bottom: 20px; }
+.perfil-negocio .tabs { border-bottom-color: var(--color-border); }
+.perfil-negocio .tab-btn { flex: 1; font-size: 15px; }
+.perfil-negocio #productos-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.perfil-negocio .producto-card, .perfil-negocio .servicio-card { box-shadow: none; border-radius: 14px; border-color: var(--color-border); }
+.perfil-negocio .producto-card__img { aspect-ratio: 4 / 3; }
+.perfil-negocio .producto-card__titulo { white-space: normal; }
+.perfil-negocio .producto-card__img-placeholder { font-size: 28px; font-weight: 600; color: var(--color-primary); }
+.perfil-negocio .servicio-card__nombre { overflow-wrap: anywhere; }
+.perfil-negocio .servicio-card__header, .perfil-negocio .servicio-card__footer { gap: 12px; flex-wrap: wrap; }
+.perfil-negocio .bottom-nav { background: var(--color-surface); }
+.perfil-negocio .bottom-nav svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.perfil-negocio .modal { color: var(--color-text); }
+.agenda-resumen__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--color-primary-light);
+  border-radius: 18px;
+  background: var(--color-primary-light);
+  color: var(--color-text);
+}
+.agenda-resumen__anticipo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: var(--space-3);
+  border: 1px solid var(--color-secondary);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: var(--color-primary);
+}
+.agenda-resumen__dato { display: flex; align-items: flex-start; gap: 8px; color: var(--color-text-muted); font-size: var(--text-sm); }
+.agenda-resumen__icono { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: var(--color-primary); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+#res-anticipo { color: var(--color-primary); font-size: var(--text-xl); font-weight: var(--weight-bold); }
+#btn-agendar { border-radius: 16px; }
+.day-btn__mes { font-size: 10px; text-transform: capitalize; white-space: nowrap; }
+.perfil-negocio .day-btn,
+.perfil-negocio .slot-btn {
+  background: var(--color-surface);
+  border-color: var(--color-primary-light);
+  color: var(--color-text);
+}
+.perfil-negocio .day-btn__dow,
+.perfil-negocio .day-btn__mes { color: var(--color-text-muted); }
+.perfil-negocio .day-btn:hover:not(:disabled),
+.perfil-negocio .slot-btn:hover:not(:disabled) {
+  background: var(--color-primary-light);
+  border-color: var(--color-secondary);
+  color: var(--color-primary);
+}
+.perfil-negocio .day-btn.selected,
+.perfil-negocio .slot-btn.selected {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-action);
+}
+.perfil-negocio .day-btn.selected .day-btn__dow,
+.perfil-negocio .day-btn.selected .day-btn__mes { color: var(--color-on-action); }
+.perfil-negocio .day-btn:disabled,
+.perfil-negocio .slot-btn:disabled,
+.perfil-negocio .slot-btn.ocupado {
+  background: var(--color-primary-light);
+  color: var(--color-text-muted);
+}
+#modal-apartado .modal { scrollbar-width: none; }
+#modal-apartado .modal::-webkit-scrollbar { display: none; }
+#modal-apartado .modal__body { scrollbar-width: none; }
+#modal-apartado .modal__body::-webkit-scrollbar { display: none; }
+#btn-confirmar-apartado { border-radius: 16px; }
+.pago-selector { position: relative; }
+.pago-selector__icono {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  color: var(--color-primary);
+  pointer-events: none;
+}
+#tipo-pago { padding-left: 46px; }
+#tipo-pago option:checked {
+  background: linear-gradient(var(--color-primary-light), var(--color-primary-light));
+  color: var(--color-primary);
+}
+.apartado-aviso { display: block; }
+
+@media (max-width: 900px) {
+  .perfil-distribucion { grid-template-columns: 260px minmax(0, 1fr); gap: 20px; }
+  .perfil-presentacion { gap: 24px; }
+}
+
+@media (max-width: 767px) {
+  .perfil-negocio .container { padding-inline: 16px; }
+  .perfil-contenido { padding-top: 16px; }
+  .perfil-presentacion { grid-template-columns: minmax(0, 1fr); gap: 18px; margin-bottom: 22px; }
+  .negocio-cover { aspect-ratio: 16 / 9; border-radius: 16px; }
+  .perfil-descripcion { margin: 12px 0; font-size: 14px; }
+  .perfil-datos { margin-bottom: 16px; }
+  .perfil-distribucion { grid-template-columns: minmax(0, 1fr); }
+  .perfil-panel { padding: 18px; }
+  .perfil-resumen .btn { width: 100%; }
+  .perfil-negocio .bottom-nav { left: 12px; right: 12px; bottom: max(8px, env(safe-area-inset-bottom)); border: 1px solid var(--color-border); border-radius: 16px; }
+  .perfil-negocio .header-nav { gap: 4px; }
+  .perfil-negocio .header-nav .btn { padding-inline: 8px; }
+  .perfil-negocio #negocio-nav a[href="mis-citas.html"] { display: none; }
+  .perfil-catalogo__titulo h2 { font-size: 22px; }
+}
+
+@media (max-width: 360px) {
+  .perfil-negocio #productos-grid { grid-template-columns: minmax(0, 1fr); }
+}

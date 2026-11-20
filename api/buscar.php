@@ -41,7 +41,7 @@ handleBuscar();
  * - Filtro de texto libre (nombre, descripción, productos, servicios)
  * - Filtro por categoría
  * - Cálculo de distancia geográfica (Haversine en km) si se proporcionan latitud y longitud
- * - Ordenamiento prioritario: `plan_suscripcion = 'pro'` primero, luego `distancia_km ASC`
+ * - Radio opcional y orden por cercanía cuando se solicita
  * - Paginación con límite y offset
  */
 function handleBuscar(): never
@@ -49,7 +49,7 @@ function handleBuscar(): never
     $pdo = getPDO();
 
     $q         = trim($_GET['q'] ?? '');
-    $categoria = trim($_GET['categoria'] ?? '');
+    $categoria = mb_strtolower(trim($_GET['categoria'] ?? ''));
     $lat       = filter_var($_GET['lat'] ?? null, FILTER_VALIDATE_FLOAT);
     $lon       = filter_var($_GET['lon'] ?? null, FILTER_VALIDATE_FLOAT);
     $pagina    = max(1, (int) ($_GET['pagina'] ?? 1));
@@ -57,14 +57,28 @@ function handleBuscar(): never
     $offset    = ($pagina - 1) * $limite;
 
     $hasGeo = ($lat !== false && $lon !== false && $lat !== null && $lon !== null);
+    $radio = filter_var($_GET['radio_km'] ?? null, FILTER_VALIDATE_FLOAT);
+    $filtrarRadio = $hasGeo && $radio > 0;
 
     // Parámetros exclusivos para la cláusula WHERE (usados en count y en main)
     $whereParts  = ['n.activo = 1'];
     $whereParams = [];
 
     if ($categoria !== '') {
-        $whereParts[] = 'n.categoria = :categoria';
-        $whereParams[':categoria'] = mb_strtolower($categoria);
+        $grupo = match ($categoria) {
+            'estetica-barberia' => ['estetica', 'barberia'],
+            'ropa-bazar' => ['ropa', 'bazar'],
+            'belleza-boutique' => ['belleza', 'boutique'],
+            default => null,
+        };
+
+        if ($grupo === null) {
+            $whereParts[] = 'n.categoria = :categoria';
+            $whereParams[':categoria'] = $categoria;
+        } else {
+            $whereParts[] = 'n.categoria IN (:categoria, :categoria_adicional)';
+            [$whereParams[':categoria'], $whereParams[':categoria_adicional']] = $grupo;
+        }
     }
 
     if ($q !== '') {
@@ -99,13 +113,7 @@ function handleBuscar(): never
 
     $whereSQL = implode(' AND ', $whereParts);
 
-    // 1. Consulta de conteo total (solo recibe los parámetros presentes en el WHERE)
-    $countSql  = "SELECT COUNT(DISTINCT n.id) AS total FROM negocios n WHERE $whereSQL";
-    $countStmt = $pdo->prepare($countSql);
-    $countStmt->execute($whereParams);
-    $total = (int) ($countStmt->fetchColumn() ?: 0);
-
-    // 2. Fragmento de cálculo de distancia mediante Haversine
+    // Fragmento de cálculo de distancia mediante Haversine
     // Usamos marcadores únicos (:lat1, :lat2, :lon) para compatibilidad total con PDO
     if ($hasGeo) {
         $selectDistancia = '
@@ -123,7 +131,21 @@ function handleBuscar(): never
         $orderBy = "ORDER BY (CASE WHEN n.plan_suscripcion = 'pro' THEN 1 ELSE 0 END) DESC, n.id DESC";
     }
 
-    // 3. Consulta principal
+    if ($hasGeo && ($_GET['orden'] ?? '') === 'distancia') {
+        $orderBy = 'ORDER BY distancia_km IS NULL, distancia_km ASC, n.id DESC';
+    }
+
+    $geoParams = $hasGeo ? [':lat1' => $lat, ':lat2' => $lat, ':lon' => $lon] : [];
+    $radioParams = $filtrarRadio ? [':radio' => $radio] : [];
+    $having = $filtrarRadio ? 'HAVING distancia_km <= :radio' : '';
+
+    $countSql = $filtrarRadio
+        ? "SELECT COUNT(*) FROM (SELECT $selectDistancia FROM negocios n WHERE $whereSQL $having) cercanos"
+        : "SELECT COUNT(*) FROM negocios n WHERE $whereSQL";
+    $countStmt = $pdo->prepare($countSql);
+    $countStmt->execute($filtrarRadio ? $whereParams + $geoParams + $radioParams : $whereParams);
+    $total = (int) $countStmt->fetchColumn();
+
     $sql = "
         SELECT 
             n.id,
@@ -136,26 +158,23 @@ function handleBuscar(): never
             n.latitud,
             n.longitud,
             n.logo_url,
+            (SELECT p.imagen_url FROM productos p
+             WHERE p.negocio_id = n.id AND p.activo = 1 AND p.imagen_url <> ''
+             ORDER BY p.id DESC LIMIT 1) AS imagen_producto_url,
+            n.plan_suscripcion,
             n.verificado,
             $selectDistancia
         FROM negocios n
         WHERE $whereSQL
+        $having
         $orderBy
         LIMIT :limite OFFSET :offset
     ";
 
     $stmt = $pdo->prepare($sql);
 
-    // Vincular parámetros de la cláusula WHERE
-    foreach ($whereParams as $paramKey => $val) {
+    foreach ($whereParams + $geoParams + $radioParams as $paramKey => $val) {
         $stmt->bindValue($paramKey, $val);
-    }
-
-    // Vincular coordenadas únicas si existen
-    if ($hasGeo) {
-        $stmt->bindValue(':lat1', $lat);
-        $stmt->bindValue(':lat2', $lat);
-        $stmt->bindValue(':lon',  $lon);
     }
 
     $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
@@ -177,6 +196,8 @@ function handleBuscar(): never
             'latitud'           => $row['latitud'] !== null ? (float) $row['latitud'] : null,
             'longitud'          => $row['longitud'] !== null ? (float) $row['longitud'] : null,
             'logo_url'          => $row['logo_url'],
+            'imagen_producto_url' => $row['imagen_producto_url'],
+            'plan_suscripcion'  => $row['plan_suscripcion'],
             'verificado'        => (bool) $row['verificado'],
             'distancia_km'      => $row['distancia_km'] !== null ? round((float) $row['distancia_km'], 2) : null,
         ];
